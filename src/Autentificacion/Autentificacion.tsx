@@ -2,6 +2,9 @@ import { FormEvent, useContext, useState } from "react";
 import { Contexto } from "../Contexto";
 import { getRegistrarUsuario } from ".";
 import { UsuarioLogin } from "../Interfaces";
+import { ImputGlobal } from "../common";
+import imagenShop from '../common/images/coffee-shop.jpg'
+import imagenDrinkWine from '../common/images/drinking-wine.jpg'
 
 export function Autentificacion() {
   const { handleAcceso } = useContext(Contexto);
@@ -9,6 +12,7 @@ export function Autentificacion() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
 
   async function HandleSubmit(e: FormEvent) {
@@ -21,8 +25,11 @@ export function Autentificacion() {
 
     const respuesta = await getRegistrarUsuario(datos);
 
-    if (respuesta && respuesta.email === datos.email && respuesta.nombre === datos.nombre && respuesta.password === datos.password) {
-      handleAcceso(true);
+    console.log(respuesta);
+    
+
+    if (respuesta) {
+      handleAcceso(true,respuesta);
     } else {
       console.error('Datos incorrectos o error en la respuesta');
     }
@@ -30,65 +37,87 @@ export function Autentificacion() {
 
   return (
     <>
-    <div className="mt-[30vh] h-96 text-white m-auto w-3/4 flex flex-col bg-red-500 rounded-md p-2">
-       
-      <div className="grid grid-cols-2 grid-rows-3 m-2 h-5/6 transition-all">
-        <div className={`${isLogin? "col-start-1 flex flex-col w-full" : "hidden"}`}>
-            <label>Nombre</label>
-          <input
-            className="text-red-500"
-            type="text"
+    <div className={`w-full mt-0 sm:w-3/4 sm:mt-4 h-screen sm:h-[90vh] md:mt-[10vh] md:h-[80vh] text-white m-auto md:w-3/4 flex flex-col rounded-md p-2 ${isLogin? "bg-red-500" : "bg-blue-700"}`}>
+
+      <div className={`flex m-2 h-5/6 transition-all duration-700 ease-in-out`}>
+        <div className={`w-full md:w-1/2 ${isLogin? "pl-0" : "translate-x-0 pl-0 md:translate-x-full md:pl-2"} transition-all duration-700 ease-in-out`}>
+          <div className="flex flex-col text-center text-wrap">
+          <p className="text-base sm:text-2xl text-wrap text-center">{ isLogin? "Bienvenido a nuestro Restaurante" : "Bienvenido de nuevo a" }</p>
+          <p className={`text-2xl sm:text-4xl ${isLogin? "text-[#262837]" : "text-[#e02a0e]"}`}>PRESIDENTE</p>
+          </div>
+
+             <div className="my-4 border-b text-center w-auto sm:w-3/4 sm:mx-auto md:w-auto md:my-5">
+                        <div
+                            className="leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
+                            Introduce tus datos
+                        </div>
+                    </div> 
+
+        <div className={`sm:w-1/2 m-auto text-center md:text-start md:w-full lg:w-1/2 lg:text-center mb-2`}>
+          <ImputGlobal type="text" id="nombre" name="nombre"
+          placeholder="Nombre"
             value={nombre}
-            onChange={(e) => {
-              setNombre(e.target.value);
-            }}
-          />
+            onChange={ (e) => {
+            setNombre(e.target.value); } }
+          >
+          </ImputGlobal>
         </div>
-        <div className={`flex flex-col w-full ${isLogin? "col-start-1" : "col-start-2"}`}>
-            <label>Correo</label>
-          <input
-            className="text-red-500"
-            type="text"
+        <div className={`sm:w-1/2 m-auto text-center md:text-start md:w-full lg:w-1/2 lg:text-center mb-2`}>
+           <ImputGlobal type="text" id="correoElectronico" name="correoElectronico"
+           placeholder="Correo"
             value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-          />
+            onChange={ (e) => {
+            setEmail(e.target.value); } }
+          >
+          </ImputGlobal>
         </div>
-        <div className={`flex flex-col w-full ${isLogin? "col-start-1" : "col-start-2"}`}>
-            <label>Contraseña</label>
-          <input
-            className="text-red-500"
-            type="text"
+        <div className={`sm:w-1/2 m-auto text-center md:text-start md:w-full lg:w-1/2 lg:text-center mb-2`}>
+           <ImputGlobal type="text" id="password" name="password"
+           placeholder="Contraseña"
             value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
-          />
+            onChange={ (e) => {
+            setPassword(e.target.value); } }
+          >
+          </ImputGlobal>
         </div>
-        <div className={`mx-2 row-start-1 row-span-3 justify-around border-4 rounded-xl border-[#262837] flex flex-col items-center ${isLogin? "col-start-2" : "col-start-1"}`}>
-             <p className="text-2xl">Bienvenido a nuestro Restaurante</p>
-             <p className="text-4xl text-[#262837]">Presidente</p>
-             <p>{ isLogin? "Si ya es usuario puede:" : "Si aún no es usuario puede:" }</p>
-             <button className={`text-xl rounded hover:bg-black bg-[#1F1D3B] p-2`}
-             onClick={ ()=> { console.log("hola");
+
+        <div className={`sm:w-1/2 m-auto text-center md:text-start md:w-full lg:w-1/2 lg:text-center mb-2 ${isLogin? "" : "hidden"}`}>
+           <ImputGlobal type="text" id="confirmPassword" name="confirmPassword"
+           placeholder="Confirmar Contraseña"
+            value={confirmPassword}
+            onChange={ (e) => {
+            setConfirmPassword(e.target.value); } }
+          >
+          </ImputGlobal>
+        </div>
+        <div className={`sm:w-1/2 m-auto md:w-full lg:w-1/2 text-center mb-2 ${isLogin? "mt-2 md:mt-6 lg:mt-10" : "mt-6 md:mt-4 lg:mt-8"}`}>
+        <p className="mb-2">{ isLogin? "Si ya es usuario puede" : "Si aún no es usuario puede" }</p>
+        <button className={`text-xl rounded hover:bg-black bg-[#1F1D3B] p-2`}
+             onClick={ ()=> {
              setIsLogin(!isLogin);
               } }
              >{ isLogin? "Registrarse" : "Crear una cuenta"} </button>
         </div>
+        </div>
+
+
+        <div className={`hidden md:block w-0 md:w-1/2 ${isLogin? "ml-2" : "-translate-x-full ml-0"} flex flex-col transition-all duration-700 ease-in-out border-4 rounded-xl border-[#1F1D3B] text-center text-wrap bg-white`}>
+             <div className="w-full h-full flex m-auto justify-center">
+              <img 
+              className=" object-cover transition-all duration-700 ease-in-out rounded-xl"
+              src={isLogin? imagenShop : imagenDrinkWine} 
+              alt="It's not possible to view the photo" />
+             </div>
+            </div>
       </div>
 
-      <div className="h-1/6 flex items-center justify-center">
+      <div className="h-auto sm:h-1/6 flex items-center mt-5 sm:justify-center flex-col">
 
-        <button onClick={HandleSubmit} className="flex justify-center content-center items-center h-3/4 w-1/3 rounded-lg text-black cursor-pointer py-1 px-6 bg-blue-400 hover:bg-blue-600"
+        <button onClick={HandleSubmit} 
+        className={`${isLogin? "bg-blue-400 hover:bg-blue-600 " : "bg-[#ec7c6a] hover:bg-[#e02a0e] "} mb-6 sm:mb-0 rounded-lg px-8 py-2 text-black cursor-pointer`}
         >  ACEPTAR
         </button>
-      </div>
-    </div>
-    <div className="fixed bottom-2 w-[100vw]">
-        <div className="m-auto w-1/2 flex justify-center">
-        <p className="p-2 text-blue-500">Power by: Emanuel</p>
-        </div>
+</div>
     </div>
     </>
   );

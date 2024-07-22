@@ -1,7 +1,7 @@
 
 
 export interface Pedidos{
-    idproducto:number;
+    idproducto:string;
     descripcion:string;
     cantidad:number;
     montoTotal:number;

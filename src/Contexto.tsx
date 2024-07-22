@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useState } from "react";
 import { pedidos } from "./pedidos";
-import { Pedidos, SeleccionSeccion } from "./Interfaces";
+import { Pedidos, SeleccionSeccion, UsuarioLogin } from "./Interfaces";
 import { seleccionSeccion } from ".";
 
 
@@ -25,7 +25,7 @@ interface ContextoProps {
   HandleHacerVisibleSecundaria: () => void;
   losPedidos: Pedidos[];
   HandleAddPedido: (
-    id: number,
+    id: string,
     descripcion: string,
     cantidad: number,
     cantidadRestante: number,
@@ -33,7 +33,7 @@ interface ContextoProps {
     imagen: string
   ) => void;
   HandleSubPedido: (
-    id: number,
+    id: string,
     cantidadInicial: number,
     descripcion: string,
     cantidad: number,
@@ -50,7 +50,7 @@ interface ContextoProps {
   selectElementBarraLateral: SeleccionSeccion[];
   handleChangeSelecionBarraLateral: (e: string )=> void;
   acceso: boolean;
-  handleAcceso: (e: boolean)=> void;
+  handleAcceso: (e: boolean, f: UsuarioLogin)=> void;
 }
 
 interface ContextoGlobalProps {
@@ -133,7 +133,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
   }
 
   function HandleAddPedido(
-    id: number,
+    id: string,
     descripcion: string,
     montoTotal: number,
     cantidadRest: number,
@@ -188,7 +188,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
   }
 
   function HandleSubPedido(
-    id: number,
+    id: string,
     cantidadInicial: number,
     descripcion: string,
     montoTotal: number,
@@ -253,13 +253,19 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     setSelectElementBarraLateral(newSelectElementosBarraLateral);
   }
 
-  function handleAcceso(acceso: boolean){
+  function handleAcceso(acceso: boolean, usuario: UsuarioLogin){
     if (acceso) {
       setAcceso(true);
-      localStorage.setItem('token', 'emanuel');
+      if (usuario.token) {
+        localStorage.setItem('token', usuario.token);
+      } else {
+        console.warn('No se recibió el token del backend');
+      }
+      localStorage.setItem('usuario', JSON.stringify(usuario));
     } else {
       setAcceso(false);
       localStorage.removeItem('token');
+      localStorage.removeItem('usuario');
     }
 }
 

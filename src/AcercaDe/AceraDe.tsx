@@ -1,5 +1,6 @@
 
-import { AcercaDeImput, AcercaDeLabel, FacebookIcon, InstagramIcon, TwitterIcon } from ".";
+import { FacebookIcon, InstagramIcon, TwitterIcon } from ".";
+import { ImputGlobal, LabelGlobal } from "../common";
 
 
 export function AcercaDe() {
@@ -22,25 +23,25 @@ export function AcercaDe() {
             <div className=" m-2 px-2">
             <div className="inline-block w-full sm:w-1/2 sm:pr-2">
               <div>
-                <AcercaDeLabel>
+                <LabelGlobal color="asercaDe">
                   Nombre
-                </AcercaDeLabel>
-                <AcercaDeImput type="text" id="name" name="name"/>
+                </LabelGlobal>
+                <ImputGlobal type="text" id="name" name="name"/>
               </div>
             </div>
             <div className="inline-block w-full sm:w-1/2 sm:pl-2">
               <div>
-                <AcercaDeLabel>
+                <LabelGlobal color="asercaDe">
                   Correo
-                </AcercaDeLabel>
-                <AcercaDeImput type="text" id="email" name="email"/>
+                </LabelGlobal>
+                <ImputGlobal type="text" id="email" name="email"/>
               </div>
             </div>
             <div>
               <div>
-                <AcercaDeLabel>
+                <LabelGlobal color="asercaDe">
                   Mensaje
-                </AcercaDeLabel>
+                </LabelGlobal>
                 <textarea
                   id="message"
                   name="message"
