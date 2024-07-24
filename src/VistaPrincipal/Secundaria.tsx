@@ -1,7 +1,8 @@
 import { RiCloseLine } from "react-icons/ri";
 import { AccionEnCarrito, Enviar, Pedido } from "./PaginasVistaPrincipal/PaginaSecundaria/UI-Secundaria";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Contexto } from "../Contexto"
+import { getLosPedidos } from "./PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios/los-pedidos.servicios";
 
 interface Props {
     visivility: boolean;
@@ -11,7 +12,19 @@ interface Props {
 
 export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
 
-    const { losPedidos,verPedidos,verOcultarRestoDeSeccion } = useContext(Contexto)
+    const { losPedidos,verPedidos,verOcultarRestoDeSeccion ,HandleChargePedidos } = useContext(Contexto)
+
+
+    useEffect(() => {
+        const obtenerLosPedidos = async () => {
+            const pedidosObtenidos = await getLosPedidos();
+            HandleChargePedidos(pedidosObtenidos);
+          };
+          console.log(losPedidos);
+          
+          obtenerLosPedidos();
+    }, [])
+    
 
     return (
      <>

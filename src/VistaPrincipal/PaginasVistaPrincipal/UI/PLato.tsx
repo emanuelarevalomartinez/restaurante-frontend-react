@@ -4,7 +4,7 @@ import { Contexto } from "../../../Contexto";
 
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
-    identificador:number;
+    identificador:string;
     nombreProducto: string;
     precio: number;
     cantidadRestante: number;

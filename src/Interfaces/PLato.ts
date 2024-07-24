@@ -1,7 +1,7 @@
 
 
 export interface Plato{
-    id:number;
+    id:string;
     descripcionPlato:string;
     precio:number;
     cantRestante:number;

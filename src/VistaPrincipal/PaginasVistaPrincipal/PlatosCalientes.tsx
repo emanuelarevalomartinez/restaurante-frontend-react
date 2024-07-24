@@ -40,7 +40,7 @@ export function PlatosCalientes() {
               platos.map( (plato,index)=> {
                return (
                     <PLato key={index}
-                      identificador={index}
+                      identificador={plato.id}
                       nombreProducto={plato.descripcionPlato}
                       precio={plato.precio}
                       cantidadRestante={plato.cantRestante}

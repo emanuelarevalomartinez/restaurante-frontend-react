@@ -23,7 +23,8 @@ interface ContextoProps {
   mostrarVistaSecundaria: boolean;
   HandlevisibilidadBarraLateral: () => void;
   HandleHacerVisibleSecundaria: () => void;
-  losPedidos: Pedidos[];
+  losPedidos: Pedidos[],
+  HandleChargePedidos: (e: Pedidos[])=> void;
   HandleAddPedido: (
     id: string,
     descripcion: string,
@@ -63,7 +64,8 @@ const defaultContext: ContextoProps = {
   mostrarVistaSecundaria: false,
   HandlevisibilidadBarraLateral: () => {},
   HandleHacerVisibleSecundaria: () => {},
-  losPedidos: pedidos,
+  losPedidos: [],
+  HandleChargePedidos: ()=> {},
   HandleAddPedido: () => {},
   HandleSubPedido: () => {},
   handleAddArticulo: () => {},
@@ -90,7 +92,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     useState<boolean>(false);
   const [mostrarVistaSecundaria, setmostrarVistaSecundaria] =
     useState<boolean>(false);
-  const [losPedios, setlosPedios] = useState<Pedidos[]>(pedidos);
+  const [losPedidos, setlosPedidos] = useState<Pedidos[]>([]);
   const [cantidadArticulosIguales, setcantidadArticulosIguales] = useState(0);
   const [verPedidos, setverPedidos] = useState(false);
   const direcciones:string[]= ["/AcercaDe"];
@@ -132,6 +134,10 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     setmostrarVistaSecundaria(!mostrarVistaSecundaria);
   }
 
+  function HandleChargePedidos(data: Pedidos[]){
+     setlosPedidos(data);
+  }
+
   function HandleAddPedido(
     id: string,
     descripcion: string,
@@ -150,22 +156,22 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     };
 
 
-    let pedidoDiferente: Pedidos[] = losPedios.filter(pedido => pedido.idproducto === id)
+    let pedidoDiferente: Pedidos[] = losPedidos.filter(pedido => pedido.idproducto === id)
     
     if (pedidoDiferente.length > 0) {
 
-      let indicePedidoExcistente = losPedios.findIndex(
+      let indicePedidoExcistente = losPedidos.findIndex(
         (pedido) => pedido.idproducto === id
       );
 
       
       
-      let actualizarPedidos: Pedidos[] = [...losPedios];
+      let actualizarPedidos: Pedidos[] = [...losPedidos];
       
       actualizarPedidos[indicePedidoExcistente] = {
         ...actualizarPedidos[indicePedidoExcistente],
         montoTotal:
-        losPedios[indicePedidoExcistente].montoTotal +
+        losPedidos[indicePedidoExcistente].montoTotal +
           (cantidadRest - 1 >= 0
             ? nuevoPedido.montoTotal
             : 0),
@@ -177,10 +183,10 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
        alert("Nooo hay más productos de este tipo disponibles");
        
       }
-      setlosPedios(actualizarPedidos);
+      setlosPedidos(actualizarPedidos);
     } else {
       setverPedidos(true);
-        setlosPedios([...losPedios, nuevoPedido]);
+        setlosPedidos([...losPedidos, nuevoPedido]);
       
      
       
@@ -206,22 +212,22 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
       imagen: imagen,
       cantidadAOrdenar: cantidadAOrdenar,
     };
-    let pedidoDiferente: Pedidos[] = losPedios.filter(
+    let pedidoDiferente: Pedidos[] = losPedidos.filter(
       (pedido) => pedido.idproducto === id
     );
 
     if (pedidoDiferente.length > 0) {
       
-      let indicePedidoExcistente = losPedios.findIndex(
+      let indicePedidoExcistente = losPedidos.findIndex(
         (pedido) => pedido.idproducto === id
       );
 
       
-      let actualizarPedidos: Pedidos[] = [...losPedios];
+      let actualizarPedidos: Pedidos[] = [...losPedidos];
       actualizarPedidos[indicePedidoExcistente] = {
         ...actualizarPedidos[indicePedidoExcistente],
         montoTotal:
-        losPedios[indicePedidoExcistente].montoTotal -
+        losPedidos[indicePedidoExcistente].montoTotal -
           (cantidadRest + 1 <= cantidadInicial
             ? quitarPedido.montoTotal
             : 0),
@@ -232,7 +238,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
         if(cantidadRest + 1 > cantidadInicial){
            alert("Ya a  reintegrado todos los productos de este tipo");
         }
-      setlosPedios(actualizarPedidos);
+      setlosPedidos(actualizarPedidos);
     } 
   }
 
@@ -277,7 +283,8 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
         mostrarVistaSecundaria: mostrarVistaSecundaria,
         HandlevisibilidadBarraLateral: HandlevisibilidadBarraLateral,
         HandleHacerVisibleSecundaria: HandleHacerVisibleSecundaria,
-        losPedidos: losPedios,
+        HandleChargePedidos:HandleChargePedidos,
+        losPedidos: losPedidos,
         HandleAddPedido: HandleAddPedido,
         handleAddArticulo: handleAddArticulo,
         handleSubArticulo: handleSubArticulo,

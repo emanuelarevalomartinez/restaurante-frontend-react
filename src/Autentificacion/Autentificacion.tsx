@@ -37,12 +37,12 @@ export function Autentificacion() {
 
   return (
     <>
-    <div className={`w-full mt-0 sm:w-3/4 sm:mt-4 h-screen sm:h-[90vh] md:mt-[10vh] md:h-[80vh] text-white m-auto md:w-3/4 flex flex-col rounded-md p-2 ${isLogin? "bg-red-500" : "bg-blue-700"}`}>
+    <div className={`w-full mt-0 sm:w-3/4 sm:mt-4 h-screen sm:h-[90vh] md:mt-[10vh] md:h-[80vh] text-white m-auto md:w-3/4 flex flex-col rounded-md p-2 ${isLogin? "bg-red-500" : "bg-[#347ef5]"}`}>
 
       <div className={`flex m-2 h-5/6 transition-all duration-700 ease-in-out`}>
-        <div className={`w-full md:w-1/2 ${isLogin? "pl-0" : "translate-x-0 pl-0 md:translate-x-full md:pl-2"} transition-all duration-700 ease-in-out`}>
+        <div className={`w-full m-auto sm:m-0 md:w-1/2 ${isLogin? "pl-0" : "translate-x-0 pl-0 md:translate-x-full md:pl-2"} transition-all duration-700 ease-in-out`}>
           <div className="flex flex-col text-center text-wrap">
-          <p className="text-base sm:text-2xl text-wrap text-center">{ isLogin? "Bienvenido a nuestro Restaurante" : "Bienvenido de nuevo a" }</p>
+          <p className="text-base sm:text-2xl text-wrap text-center">{ isLogin? "Bienvenido a nuestro Restaurante" : "Bienvenido de vuelta a" }</p>
           <p className={`text-2xl sm:text-4xl ${isLogin? "text-[#262837]" : "text-[#e02a0e]"}`}>PRESIDENTE</p>
           </div>
 
