@@ -1,24 +1,26 @@
 import { RiArrowDownSLine } from "react-icons/ri";
 import { PLato, getPlatosCalientes } from "./UI";
 import { ImagenPlato } from "./UI/ImagenPlato";
-import { useContext, useEffect, useState } from "react";
-import { Plato } from "../../Interfaces";
+import { useContext, useEffect } from "react";
 import { Contexto } from "../../Contexto";
+import { Cargando } from "../../Cargando";
 
 export function PlatosCalientes() {
 
+  const { acceso,HandleActualizarPlatosCalientes,platosCalientes,verOcultarRestoDeSeccion } = useContext(Contexto);
+  
+  useEffect(() => {
+      const obtenerPlatos = async () => {
+        const platosObtenidos = await getPlatosCalientes();
+        HandleActualizarPlatosCalientes(platosObtenidos);
+      };
+      obtenerPlatos();
+  }, []);
 
-       const [platos, setplatos] = useState<Plato[]>([]);
-
-       useEffect(() => {
-        const obtenerPlatos = async () => {
-          const platosObtenidos = await getPlatosCalientes();
-          setplatos(platosObtenidos); 
-        };
-        obtenerPlatos();
-      }, []);
-
-      const { verOcultarRestoDeSeccion } = useContext(Contexto);
+      if (!platosCalientes.length) {
+        return <Cargando/>;
+      }
+      
 
     return (
         <div className={`${verOcultarRestoDeSeccion? "hidden" : "px-4"}`}>
@@ -37,7 +39,7 @@ export function PlatosCalientes() {
 
 
            { 
-              platos.map( (plato,index)=> {
+              platosCalientes.map( (plato,index)=> {
                return (
                     <PLato key={index}
                       identificador={plato.id}

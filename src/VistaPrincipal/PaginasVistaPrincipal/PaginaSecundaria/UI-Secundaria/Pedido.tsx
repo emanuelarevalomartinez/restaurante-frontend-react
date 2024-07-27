@@ -7,13 +7,23 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
     cantidad:number;
     montoTotal:number;
     imagen:string;
+    tipoProducto:string;
  }
 
-export function Pedido({descripcion,cantidad,montoTotal,imagen}:Props){
+export function Pedido({descripcion,cantidad,montoTotal,imagen,tipoProducto}:Props){
     
 
     const [guardarNota, setguardarNota] = useState(false);
     const [eliminarNota, seteliminarNota] = useState(false);
+    const [colorProducto, setcolorProducto] = useState(() => {
+        let color = "";
+        if(tipoProducto == "plato-Caliente"){
+              color = "text-[#ec7c6a]";
+        }
+        return color;
+      });
+
+   
     
     return (
         <div className="bg-[#262837] rounded-xl py-4 my-2 px-2 text-center w-auto">
@@ -33,11 +43,12 @@ export function Pedido({descripcion,cantidad,montoTotal,imagen}:Props){
             </div>
         </div>
         <div className="grid grid-cols-6">
-            <input
+            {/* <input
                 type="text"
                 className="bg-[#1F1D2B] col-span-4 py-1 px-4 rounded-lg outline-none"
                 placeholder="Añadir nota"
-            />
+            /> */}
+            <p className={`bg-[#1F1D2B] col-span-4 py-1 px-4 rounded-lg outline-none ${colorProducto}`}>{tipoProducto}</p>
             <button
                 onMouseEnter={() => setguardarNota(true)}
                 onMouseLeave={() => setguardarNota(false)}

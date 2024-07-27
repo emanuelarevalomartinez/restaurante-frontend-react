@@ -1,19 +1,23 @@
 import { FormEvent, useContext, useState } from "react";
-import { Contexto } from "../Contexto";
 import { getRegistrarUsuario } from ".";
 import { UsuarioLogin } from "../Interfaces";
 import { ImputGlobal } from "../common";
 import imagenShop from '../common/images/coffee-shop.jpg'
 import imagenDrinkWine from '../common/images/drinking-wine.jpg'
+import { Contexto } from "../Contexto";
 
 export function Autentificacion() {
-  const { handleAcceso } = useContext(Contexto);
+
+
+ const { login } = useContext(Contexto);
+
 
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLogin, setIsLogin] = useState(true);
+
 
   async function HandleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -23,16 +27,26 @@ export function Autentificacion() {
       password: password,
     };
 
+    console.log(datos);
+   
     const respuesta = await getRegistrarUsuario(datos);
-
     console.log(respuesta);
     
-
     if (respuesta) {
-      handleAcceso(true,respuesta);
+     login(respuesta);
     } else {
       console.error('Datos incorrectos o error en la respuesta');
     }
+
+    // if (respuesta) {
+    //   console.log(respuesta);
+    //   setResponse(respuesta);
+    //   // login(respuesta);
+      
+    // } else {
+    //   console.error('Datos incorrectos o error en la respuesta');
+    // } 
+  
   }
 
   return (

@@ -3,6 +3,7 @@ import { AccionEnCarrito, Enviar, Pedido } from "./PaginasVistaPrincipal/PaginaS
 import { useContext, useEffect } from "react";
 import { Contexto } from "../Contexto"
 import { getLosPedidos } from "./PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios/los-pedidos.servicios";
+import { Auth } from "../Autentificacion/Auth";
 
 interface Props {
     visivility: boolean;
@@ -12,20 +13,20 @@ interface Props {
 
 export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
 
-    const { losPedidos,verPedidos,verOcultarRestoDeSeccion ,HandleChargePedidos } = useContext(Contexto)
+    const {losPedidos,verOcultarRestoDeSeccion,escuchaPedidos,setEscuchaPedidos, HandleChargePedidos } = useContext(Contexto);
 
-
-    useEffect(() => {
-        const obtenerLosPedidos = async () => {
-            const pedidosObtenidos = await getLosPedidos();
+useEffect(() => {
+    const obtenerLosPedidos = async () => {
+        const usuario = Auth();
+            if(usuario){
+            const pedidosObtenidos = await getLosPedidos(usuario.idUsuario);
             HandleChargePedidos(pedidosObtenidos);
-          };
-          console.log(losPedidos);
-          
-          obtenerLosPedidos();
-    }, [])
-    
-
+            setEscuchaPedidos(false);
+        }
+        };
+        obtenerLosPedidos();
+      }, [escuchaPedidos]);
+     
     return (
      <>
      <div className={`${verOcultarRestoDeSeccion? "hidden -right-full" : ""}`}>
@@ -64,26 +65,27 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
   <div className="h-[50vh] lg:h-[60vh] overflow-y-scroll scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-100"
  
   >
-     {verPedidos? losPedidos.map( (pedido,index) => { 
-        return (
-            losPedidos[index].cantidadAOrdenar > 0  &&
-            <Pedido key={index} 
-            descripcion={pedido.descripcion}
-            montoTotal={pedido.montoTotal}
-                imagen={pedido.imagen}
-            cantidad={pedido.cantidadAOrdenar}>
-            </Pedido> 
-            
-        )
-    
-    }  ) :
-     <div className="rounded-sm text-center py-10 sm:py-32 lg:py-48 text-red-500 border-t-2  mt-4 border-b-2 border-red-500 m-auto">      
-        <span> Aún no tiene pedidos</span>
-      </div>
-      }
+{!losPedidos.length ? (
+    <div className="rounded-sm text-center py-10 sm:py-32 lg:py-48 text-red-500 border-t-2 mt-4 border-b-2 border-red-500 m-auto">
+      <span>Aún no tiene pedidos</span>
+    </div>
+  ) : escuchaPedidos ? (
+    <div className="rounded-sm text-center py-10 sm:py-32 lg:py-48 text-green-500 border-t-2 mt-4 border-b-2 border-red-500 m-auto">
+      <span>Cargando...</span>
+    </div>
+  ) : (
+    losPedidos.map((pedido, index) => (
+      <Pedido
+        key={index}
+        descripcion={pedido.descripcion}
+        montoTotal={pedido.montoTotal}
+        imagen={pedido.imagen}
+        tipoProducto={pedido.tipoProducto}
+        cantidad={pedido.cantidadAOrdenar}
+      />
+    ))
+  )}
   </div>
-
-
 </div>
 <Enviar 
 descuento={30}

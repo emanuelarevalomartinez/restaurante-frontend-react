@@ -5,7 +5,10 @@ import { Contexto } from "../Contexto";
 
 export function BarraDeNavegacion() {
 
-    let seleccionado: string = "border-b border-[#ec7c6a] text-[#ec7c6a] mx-2 flex flex-nowrap";
+    let platosCalientes: string = "border-b border-[#ec7c6a] text-[#ec7c6a] mx-2 flex flex-nowrap";
+    let platosFrios: string = "border-b border-blue-500 text-blue-500 mx-2 flex flex-nowrap";
+    let bebidas: string = "border-b border-emerald-500 text-emerald-500 mx-2 flex flex-nowrap";
+    let postres: string = "border-b border-yellow-500 text-yellow-500 mx-2 flex flex-nowrap";
     let estiloNormal: string = "mx-2 flex flex-nowrap";
     const [estadoSeleccion, setestadoSeleccion] = useState(0);
 
@@ -28,22 +31,22 @@ export function BarraDeNavegacion() {
             <Link 
                 to="/"
                 onClick={() => { HandleCambiarEstado(0) }}
-                className={estadoSeleccion == 0 ? seleccionado : estiloNormal}> <span className="mr-2">Platos</span> <span>Calientes</span>
+                className={estadoSeleccion == 0 ? platosCalientes : estiloNormal}> <span className="mr-2">Platos</span> <span>Calientes</span>
             </Link>
             <Link 
                 to="/PlatosFrios"
                 onClick={() => { HandleCambiarEstado(1) }}
-                className={estadoSeleccion == 1 ? seleccionado : estiloNormal}> <span className="mr-2">Platos</span> <span>Fríos</span>
+                className={estadoSeleccion == 1 ? platosFrios : estiloNormal}> <span className="mr-2">Platos</span> <span>Fríos</span>
             </Link>
             <Link 
                 to="/Sopas"
                 onClick={() => { HandleCambiarEstado(2) }}
-                className={estadoSeleccion == 2 ? seleccionado : estiloNormal}> Bebidas
+                className={estadoSeleccion == 2 ? bebidas : estiloNormal}> Bebidas
             </Link>
             <Link 
                 to="/Parrilladas"
                 onClick={() => { HandleCambiarEstado(3) }}
-                className={estadoSeleccion == 3 ? seleccionado : estiloNormal}> Postres
+                className={estadoSeleccion == 3 ? postres : estiloNormal}> Postres
             </Link>
         </nav>
     )

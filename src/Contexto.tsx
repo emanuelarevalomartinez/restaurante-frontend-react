@@ -1,21 +1,22 @@
 import { ReactNode, createContext, useState } from "react";
-import { pedidos } from "./pedidos";
-import { Pedidos, SeleccionSeccion, UsuarioLogin } from "./Interfaces";
+import {
+  PedidoActualizar,
+  Pedidos,
+  PlatoCaliente,
+  PlatoCalienteActualizar,
+  SeleccionSeccion,
+  Usuario,
+} from "./Interfaces";
 import { seleccionSeccion } from ".";
+import { updatePedido } from "./VistaPrincipal/PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios";
 
-
-// tablas de base de datos:  carrito, notificaciones, usuario, 
-// estoy trabajando en el backend en ver como establecer las relaciones del  usuario 
+// estoy trabajando en el backend en ver como establecer las relaciones del  usuario
 // si es usuario o administrador
 // luego de eso arreglar el crear usuario  y asociarle sus respectivas relaciones
-// añadir el tocken asociado a cada respectivo usuario
 // documentar la api
-// añadir /api/ a la ruta global
 // añadir limite de los datos que se devuelvan por pagina
 // añadir paginacion en el frontend
 // crear modal del frontend y las notificaciones emergentes
-
-//! hay un problema serio , al añadir productos al carrito y  cambiar de pestaña y volver a platos calientes se vuelven a cargar todos  los datos
 
 interface ContextoProps {
   barraVistaMovil: boolean;
@@ -23,8 +24,13 @@ interface ContextoProps {
   mostrarVistaSecundaria: boolean;
   HandlevisibilidadBarraLateral: () => void;
   HandleHacerVisibleSecundaria: () => void;
-  losPedidos: Pedidos[],
-  HandleChargePedidos: (e: Pedidos[])=> void;
+  platosCalientes: PlatoCaliente[];
+  HandleActualizarPlatosCalientes: (e: PlatoCaliente[]) => void;
+  losPedidos: Pedidos[];
+  HandleChargePedidos: (e: Pedidos[]) => void;
+  HandleActualizarPlatoCalienteEspeficico: (e: string, f:number)=> void;
+  escuchaPedidos: boolean;
+  setEscuchaPedidos: (e: boolean) => void;
   HandleAddPedido: (
     id: string,
     descripcion: string,
@@ -33,25 +39,18 @@ interface ContextoProps {
     cantidadAOrdenar: number,
     imagen: string
   ) => void;
-  HandleSubPedido: (
-    id: string,
-    cantidadInicial: number,
-    descripcion: string,
-    cantidad: number,
-    cantidadRestante: number,
-    cantidadAOrdenar: number,
-    imagen: string
-  ) => void;
   handleAddArticulo: (e: number) => void;
-  handleSubArticulo: (e: number, f: number) => void;
-  verPedidos: boolean;
-  direcciones:string[];
-  handleVerOcultarContenido: (e: boolean)=> void;
+  direcciones: string[];
+  handleVerOcultarContenido: (e: boolean) => void;
   verOcultarRestoDeSeccion: boolean;
   selectElementBarraLateral: SeleccionSeccion[];
-  handleChangeSelecionBarraLateral: (e: string )=> void;
+  handleChangeSelecionBarraLateral: (e: string) => void;
   acceso: boolean;
-  handleAcceso: (e: boolean, f: UsuarioLogin)=> void;
+  setAcceso: (e: boolean) => void;
+  login: (e: Usuario) => void;
+  logout: () => void;
+  usuario: Usuario | null;
+  setUsuario: (e: Usuario | null )=> void;
 }
 
 interface ContextoGlobalProps {
@@ -64,62 +63,126 @@ const defaultContext: ContextoProps = {
   mostrarVistaSecundaria: false,
   HandlevisibilidadBarraLateral: () => {},
   HandleHacerVisibleSecundaria: () => {},
+  platosCalientes: [],
+  HandleActualizarPlatosCalientes: () => {},
   losPedidos: [],
-  HandleChargePedidos: ()=> {},
+  HandleChargePedidos: () => {},
+  HandleActualizarPlatoCalienteEspeficico: ()=> {},
+  escuchaPedidos: true,
+  setEscuchaPedidos: () => {},
   HandleAddPedido: () => {},
-  HandleSubPedido: () => {},
   handleAddArticulo: () => {},
-  handleSubArticulo: () => {},
-  verPedidos: false,
-  direcciones:[],
-  handleVerOcultarContenido: ()=> {},
+  direcciones: [],
+  handleVerOcultarContenido: () => {},
   verOcultarRestoDeSeccion: false,
-  selectElementBarraLateral: [{ 
-    nombre:"home",
-    seleccionado: true,
-   }],
-   handleChangeSelecionBarraLateral: ( )=> {},
-   acceso: false,
-   handleAcceso: ()=> {},
-  };
+  selectElementBarraLateral: [
+    {
+      nombre: "home",
+      seleccionado: true,
+    },
+  ],
+  handleChangeSelecionBarraLateral: () => {},
+  acceso: false,
+  setAcceso: ()=> {},
+  login: () => {},
+  logout: () => {},
+  usuario: null,
+  setUsuario: ()=> {},
+};
 
 export const Contexto = createContext<ContextoProps>(defaultContext);
 
 export function ContextoGlobal({ children }: ContextoGlobalProps) {
-
   const [barraVistaMovil] = useState<boolean>(true);
   const [barraLateralVisivilidad, setbarraLateralVisivilidad] =
     useState<boolean>(false);
   const [mostrarVistaSecundaria, setmostrarVistaSecundaria] =
     useState<boolean>(false);
+  const [platosCalientes, setPlatosCalientes] = useState<PlatoCaliente[]>([]);
   const [losPedidos, setlosPedidos] = useState<Pedidos[]>([]);
   const [cantidadArticulosIguales, setcantidadArticulosIguales] = useState(0);
-  const [verPedidos, setverPedidos] = useState(false);
-  const direcciones:string[]= ["/AcercaDe"];
-  const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] = useState(false);
-  const [selectElementBarraLateral, setSelectElementBarraLateral] = useState(seleccionSeccion);
-  const [acceso, setAcceso] = useState(() => {
-    const token = localStorage.getItem('token');
-    return token ? true : false;
-  });
+  const direcciones: string[] = ["/AcercaDe"];
+  const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] =
+    useState(false);
+  const [selectElementBarraLateral, setSelectElementBarraLateral] =
+    useState(seleccionSeccion);
+  const [escuchaPedidos, setEscuchaPedidos] = useState(true);
+  const [escuchaPlatosCalientes, setEscuchaPlatosCalientes] = useState(true);
 
+
+  const [usuario, setUsuario] = useState<Usuario | null>(null);
+  const [acceso, setAcceso] = useState(() => {
+    const exist = localStorage.getItem('usuario');
+    return exist ? true : false;
+  });
+  const [loading, setLoading] = useState(false);
+  
+
+  // function login(usuario: Usuario) {
+  //     if (usuario) {
+  //       localStorage.setItem("usuario", JSON.stringify(usuario));
+  //       setAcceso(true);
+  //         let user = localStorage.getItem("usuario");
+  //           setUsuario(JSON.parse(user));
+  //     } else {
+  //       console.warn("No se recibió el token del backend");
+  //       setAcceso(false);
+  //       localStorage.removeItem("usuario");
+  //     }
+    
+  // }
+
+  function login(usuario: Usuario | null) {
+    if (usuario) {
+      localStorage.setItem("usuario", JSON.stringify(usuario));
+      setAcceso(true);
+  
+      const user = localStorage.getItem("usuario");
+      if (user) {
+        try {
+          const parsedUser: Usuario = JSON.parse(user);
+          setUsuario(parsedUser);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          setUsuario(null);
+        }
+      } else {
+        console.error('No user data found in localStorage');
+        setUsuario(null);
+      }
+    } else {
+      console.warn("No se recibió el token del backend");
+      setAcceso(false);
+      localStorage.removeItem("usuario");
+    }
+  }
+
+  function logout(){
+    localStorage.removeItem('usuario');
+                  setAcceso(false);
+                  setUsuario(null);
+  }
+
+  function HandleActualizarPlatosCalientes(platos: PlatoCaliente[]) {
+    setPlatosCalientes(platos);
+  }
+
+  function HandleActualizarPlatoCalienteEspeficico(platoId: string, nuevaCantidadRestante: number) {
+    const indice = platosCalientes.findIndex(plato => plato.id === platoId);
+    if (indice !== -1) {
+      const nuevosPlatosCalientes = [...platosCalientes];
+      nuevosPlatosCalientes[indice].cantRestante = nuevaCantidadRestante;
+      setPlatosCalientes(nuevosPlatosCalientes);
+    }
+  }
+  
+  
 
   function handleAddArticulo(cantidadRestante: number) {
     if (cantidadRestante - 1 < 0) {
       setcantidadArticulosIguales(cantidadArticulosIguales);
     } else {
       setcantidadArticulosIguales(cantidadArticulosIguales + 1);
-    }
-  }
-
-  function handleSubArticulo(
-    cantidadRestante: number,
-    cantidadInicial: number
-  ) {
-    if (cantidadRestante + 1 > cantidadInicial) {
-      setcantidadArticulosIguales(cantidadArticulosIguales);
-    } else {
-      setcantidadArticulosIguales(cantidadArticulosIguales - 1);
     }
   }
 
@@ -134,9 +197,10 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     setmostrarVistaSecundaria(!mostrarVistaSecundaria);
   }
 
-  function HandleChargePedidos(data: Pedidos[]){
-     setlosPedidos(data);
+  function HandleChargePedidos(data: Pedidos[]) {
+    setlosPedidos(data);
   }
+
 
   function HandleAddPedido(
     id: string,
@@ -146,8 +210,10 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     cantidadAOrdenar: number,
     imagen: string
   ) {
+
     let nuevoPedido: Pedidos = {
-      idproducto: id,
+      tipoProducto:"revisar handle add pedido",
+      idProducto: id,
       descripcion: descripcion,
       cantidad: cantidadRest,
       montoTotal: montoTotal,
@@ -155,125 +221,76 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
       cantidadAOrdenar: cantidadAOrdenar,
     };
 
-
-    let pedidoDiferente: Pedidos[] = losPedidos.filter(pedido => pedido.idproducto === id)
-    
-    if (pedidoDiferente.length > 0) {
-
-      let indicePedidoExcistente = losPedidos.findIndex(
-        (pedido) => pedido.idproducto === id
-      );
-
-      
-      
-      let actualizarPedidos: Pedidos[] = [...losPedidos];
-      
-      actualizarPedidos[indicePedidoExcistente] = {
-        ...actualizarPedidos[indicePedidoExcistente],
-        montoTotal:
-        losPedidos[indicePedidoExcistente].montoTotal +
-          (cantidadRest - 1 >= 0
-            ? nuevoPedido.montoTotal
-            : 0),
-        cantidadAOrdenar:
-          actualizarPedidos[indicePedidoExcistente].cantidadAOrdenar +
-          (cantidadRest - 1 < 0 ? 0 : cantidadAOrdenar),
-      };
-      if(cantidadRest -1  < 0){
-       alert("Nooo hay más productos de este tipo disponibles");
-       
-      }
-      setlosPedidos(actualizarPedidos);
-    } else {
-      setverPedidos(true);
-        setlosPedidos([...losPedidos, nuevoPedido]);
-      
-     
-      
-    }
-  }
-
-  function HandleSubPedido(
-    id: string,
-    cantidadInicial: number,
-    descripcion: string,
-    montoTotal: number,
-    cantidadRest: number,
-    cantidadAOrdenar: number,
-    imagen: string
-  ) {
-   
-
-    let quitarPedido: Pedidos = {
-      idproducto: id,
-      descripcion: descripcion,
-      cantidad: cantidadRest,
-      montoTotal: montoTotal,
-      imagen: imagen,
-      cantidadAOrdenar: cantidadAOrdenar,
-    };
-    let pedidoDiferente: Pedidos[] = losPedidos.filter(
-      (pedido) => pedido.idproducto === id
+    const findProductoExistente = losPedidos.filter(
+      (pedido) => pedido.idProducto === nuevoPedido.idProducto
     );
 
-    if (pedidoDiferente.length > 0) {
-      
-      let indicePedidoExcistente = losPedidos.findIndex(
-        (pedido) => pedido.idproducto === id
-      );
+    const buscarPlatoCaliente = platosCalientes.filter(
+      (plato) => plato.id == nuevoPedido.idProducto
+    );
 
+    let montoBase: number = 1;
+    let cantRes:number = 0;
+
+    if (buscarPlatoCaliente) {
+      montoBase = buscarPlatoCaliente[0].precio;
+      cantRes = buscarPlatoCaliente[0].cantRestante;
+    }
+
+    if(cantRes-1 < 0 ){
+      console.log("it is not posibble");
       
-      let actualizarPedidos: Pedidos[] = [...losPedidos];
-      actualizarPedidos[indicePedidoExcistente] = {
-        ...actualizarPedidos[indicePedidoExcistente],
-        montoTotal:
-        losPedidos[indicePedidoExcistente].montoTotal -
-          (cantidadRest + 1 <= cantidadInicial
-            ? quitarPedido.montoTotal
-            : 0),
-        cantidadAOrdenar:
-          actualizarPedidos[indicePedidoExcistente].cantidadAOrdenar -
-          (cantidadRest + 1 > cantidadInicial ? 0 : cantidadAOrdenar),
-      };
-        if(cantidadRest + 1 > cantidadInicial){
-           alert("Ya a  reintegrado todos los productos de este tipo");
-        }
-      setlosPedidos(actualizarPedidos);
-    } 
+    } else {
+      if (findProductoExistente.length > 0) {
+        let elementoAActualizar: Pedidos = findProductoExistente[0];
+  
+        let actualizar: PedidoActualizar = {
+          descripcion: elementoAActualizar.descripcion,
+          montoTotal: elementoAActualizar.montoTotal + montoBase,
+          cantidadAOrdenar: elementoAActualizar.cantidadAOrdenar + 1,
+        };
+  
+        //permite establecer elrecargo del componente
+        setEscuchaPedidos(true);
+        
+  
+        updatePedido(elementoAActualizar.idProducto, actualizar)
+          .then((data) => {
+          })
+          .catch((error) => {
+            console.error("Error al actualizar el pedido:");
+            console.log(error);
+          });
+      }
+    }
+
+  
   }
 
-  function handleVerOcultarContenido(status: boolean){
-      setverOcultarRestoDeSeccion(status);
+  function handleVerOcultarContenido(status: boolean) {
+    setverOcultarRestoDeSeccion(status);
   }
 
-  function handleChangeSelecionBarraLateral(seccionEscogidaAVisualizar: string){
-
+  function handleChangeSelecionBarraLateral(
+    seccionEscogidaAVisualizar: string
+  ) {
     const newSelectElementosBarraLateral = selectElementBarraLateral;
     newSelectElementosBarraLateral.forEach((seccionActual, index) => {
       if (seccionActual.nombre === seccionEscogidaAVisualizar) {
-        newSelectElementosBarraLateral[index] = {...seccionActual, seleccionado: true };
+        newSelectElementosBarraLateral[index] = {
+          ...seccionActual,
+          seleccionado: true,
+        };
       } else {
-        newSelectElementosBarraLateral[index] = {...seccionActual, seleccionado: false };
+        newSelectElementosBarraLateral[index] = {
+          ...seccionActual,
+          seleccionado: false,
+        };
       }
     });
     setSelectElementBarraLateral(newSelectElementosBarraLateral);
   }
 
-  function handleAcceso(acceso: boolean, usuario: UsuarioLogin){
-    if (acceso) {
-      setAcceso(true);
-      if (usuario.token) {
-        localStorage.setItem('token', usuario.token);
-      } else {
-        console.warn('No se recibió el token del backend');
-      }
-      localStorage.setItem('usuario', JSON.stringify(usuario));
-    } else {
-      setAcceso(false);
-      localStorage.removeItem('token');
-      localStorage.removeItem('usuario');
-    }
-}
 
   return (
     <Contexto.Provider
@@ -283,20 +300,26 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
         mostrarVistaSecundaria: mostrarVistaSecundaria,
         HandlevisibilidadBarraLateral: HandlevisibilidadBarraLateral,
         HandleHacerVisibleSecundaria: HandleHacerVisibleSecundaria,
-        HandleChargePedidos:HandleChargePedidos,
+        HandleChargePedidos: HandleChargePedidos,
+        platosCalientes: platosCalientes,
+        HandleActualizarPlatosCalientes: HandleActualizarPlatosCalientes,
         losPedidos: losPedidos,
+        HandleActualizarPlatoCalienteEspeficico:HandleActualizarPlatoCalienteEspeficico,
+        escuchaPedidos: escuchaPedidos,
+        setEscuchaPedidos: setEscuchaPedidos,
         HandleAddPedido: HandleAddPedido,
         handleAddArticulo: handleAddArticulo,
-        handleSubArticulo: handleSubArticulo,
-        HandleSubPedido: HandleSubPedido,
-        verPedidos: verPedidos,
-        direcciones:direcciones,
+        direcciones: direcciones,
         handleVerOcultarContenido: handleVerOcultarContenido,
         verOcultarRestoDeSeccion: verOcultarRestoDeSeccion,
         selectElementBarraLateral: selectElementBarraLateral,
         handleChangeSelecionBarraLateral: handleChangeSelecionBarraLateral,
-        acceso:acceso,
-        handleAcceso: handleAcceso,
+        acceso: acceso,
+        setAcceso:setAcceso,
+        login: login,
+        logout:logout,
+        usuario:usuario,
+        setUsuario:setUsuario,
       }}
     >
       {children}

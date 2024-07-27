@@ -6,7 +6,7 @@ import { Contexto } from "../Contexto";
 
 export function Cabecera() {
 
-const { verOcultarRestoDeSeccion, handleAcceso } = useContext(Contexto);
+const { verOcultarRestoDeSeccion, logout } = useContext(Contexto);
 
     return (
         <header className={`${verOcultarRestoDeSeccion? "w-screen" : "w-auto"} px-4 sm:p-4`}>
@@ -16,7 +16,7 @@ const { verOcultarRestoDeSeccion, handleAcceso } = useContext(Contexto);
                     <PalabraCambiarColor palabra="Presidente" tiempoEspera={3000}/>
                     <p className="text-gray-500 text-sm sm:text-base">{new Date().getDate()} - {new Date().getMonth() + 1} - {new Date().getFullYear()}</p>
                     <button className="bg-red-500" onClick={ ()=> {
-                       handleAcceso(false);
+                    logout();
                     } }>Salir</button>
                 </div>
                 <form>

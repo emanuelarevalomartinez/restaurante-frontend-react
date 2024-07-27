@@ -1,9 +1,11 @@
-import { UsuarioLogin } from "../Interfaces";
+
+import { Usuario, UsuarioLogin } from "../Interfaces";
 
 
-export async function getRegistrarUsuario(datos: UsuarioLogin): Promise<UsuarioLogin | null> {
+export async function getRegistrarUsuario(datos: UsuarioLogin): Promise<Usuario | null> {
+
     try {
-      const response = await fetch('http://localhost:3000/api/usuario/login', { // Asegúrate de que la URL sea correcta
+      const response = await fetch('http://localhost:3000/api/usuario/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -16,7 +18,7 @@ export async function getRegistrarUsuario(datos: UsuarioLogin): Promise<UsuarioL
         throw new Error(errorData.message || 'Error al registrar usuario');
       }
   
-      const data: UsuarioLogin = await response.json();
+      const data: Usuario = await response.json();
       return data;
     } catch (error) {
       console.error(error);

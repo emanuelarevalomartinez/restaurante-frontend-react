@@ -7,16 +7,21 @@ import { Autentificacion } from './Autentificacion/Autentificacion'
 
 function App() {
 
-const { barraLateralVisivilidad } = useContext(Contexto);
-const { HandlevisibilidadBarraLateral } = useContext(Contexto);
-const { mostrarVistaSecundaria } = useContext(Contexto);
-const { HandleHacerVisibleSecundaria } = useContext(Contexto);
+const { barraLateralVisivilidad,HandlevisibilidadBarraLateral,mostrarVistaSecundaria,HandleHacerVisibleSecundaria } = useContext(Contexto);
 
 const { acceso } = useContext(Contexto);
 
+   if(!acceso){
+   return(
+    <>
+     <Autentificacion/>
+    </>
+   );
+   }
+
   return (
    <>
-   {acceso?  <div className='bg-[#262837] w-full min-h-screen grid grid-cols-2 lg:grid lg:grid-cols-8 '>
+   <div className='bg-[#262837] w-full min-h-screen grid grid-cols-2 lg:grid lg:grid-cols-8 '>
          
          <VistaPrincipal/>
   
@@ -31,9 +36,7 @@ const { acceso } = useContext(Contexto);
          <Secundaria visivility={mostrarVistaSecundaria} 
          changeVisilitySecundaria={HandleHacerVisibleSecundaria}
          />
-      </div> : <div>
-        <Autentificacion/>
-      </div>  }
+      </div> 
    </>
   )
 }
