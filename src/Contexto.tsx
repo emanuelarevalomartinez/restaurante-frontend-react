@@ -3,16 +3,15 @@ import {
   PedidoActualizar,
   Pedidos,
   PlatoCaliente,
-  PlatoCalienteActualizar,
   SeleccionSeccion,
   Usuario,
 } from "./Interfaces";
 import { seleccionSeccion } from ".";
-import { updatePedido } from "./VistaPrincipal/PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios";
+import { crearPedido, deletePedidoMedianteUsuario, updatePedido } from "./VistaPrincipal/PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios";
+import { Auth } from "./Autentificacion/Auth";
 
 // estoy trabajando en el backend en ver como establecer las relaciones del  usuario
 // si es usuario o administrador
-// luego de eso arreglar el crear usuario  y asociarle sus respectivas relaciones
 // documentar la api
 // añadir limite de los datos que se devuelvan por pagina
 // añadir paginacion en el frontend
@@ -25,22 +24,31 @@ interface ContextoProps {
   HandlevisibilidadBarraLateral: () => void;
   HandleHacerVisibleSecundaria: () => void;
   platosCalientes: PlatoCaliente[];
-  HandleActualizarPlatosCalientes: (e: PlatoCaliente[]) => void;
+  setPlatosCalientes: (e: PlatoCaliente[]) => void;
   losPedidos: Pedidos[];
-  HandleChargePedidos: (e: Pedidos[]) => void;
+  setlosPedidos:(e: Pedidos[])=> void;
   HandleActualizarPlatoCalienteEspeficico: (e: string, f:number)=> void;
+  HanddleDevolverTodosLosPlatos: (e: string, f:number)=> void;
   escuchaPedidos: boolean;
   setEscuchaPedidos: (e: boolean) => void;
+  escuchaPlatosCalientes: boolean;
+  setEscuchaPlatosCalientes: (e: boolean) => void;
+  escuchaPlatoCaliente: boolean;
+  setEscuchaPlatoCaliente: (e: boolean) => void;
   HandleAddPedido: (
     id: string,
     descripcion: string,
     cantidad: number,
-    cantidadRestante: number,
     cantidadAOrdenar: number,
     imagen: string
   ) => void;
-  handleAddArticulo: (e: number) => void;
-  direcciones: string[];
+  HandleSubPedido: (
+    id: string,
+    descripcion: string,
+    cantidad: number,
+    cantidadAOrdenar: number,
+    imagen: string
+  ) => void;
   handleVerOcultarContenido: (e: boolean) => void;
   verOcultarRestoDeSeccion: boolean;
   selectElementBarraLateral: SeleccionSeccion[];
@@ -64,15 +72,19 @@ const defaultContext: ContextoProps = {
   HandlevisibilidadBarraLateral: () => {},
   HandleHacerVisibleSecundaria: () => {},
   platosCalientes: [],
-  HandleActualizarPlatosCalientes: () => {},
+  setPlatosCalientes: ()=> {},
   losPedidos: [],
-  HandleChargePedidos: () => {},
+  setlosPedidos: ()=> {},
   HandleActualizarPlatoCalienteEspeficico: ()=> {},
+  HanddleDevolverTodosLosPlatos: ()=> {},
   escuchaPedidos: true,
   setEscuchaPedidos: () => {},
+  escuchaPlatosCalientes: true,
+  setEscuchaPlatosCalientes: () => {},
+  escuchaPlatoCaliente: true,
+  setEscuchaPlatoCaliente: ()=> {},
   HandleAddPedido: () => {},
-  handleAddArticulo: () => {},
-  direcciones: [],
+  HandleSubPedido: () => {},
   handleVerOcultarContenido: () => {},
   verOcultarRestoDeSeccion: false,
   selectElementBarraLateral: [
@@ -100,14 +112,13 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     useState<boolean>(false);
   const [platosCalientes, setPlatosCalientes] = useState<PlatoCaliente[]>([]);
   const [losPedidos, setlosPedidos] = useState<Pedidos[]>([]);
-  const [cantidadArticulosIguales, setcantidadArticulosIguales] = useState(0);
-  const direcciones: string[] = ["/AcercaDe"];
   const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] =
     useState(false);
   const [selectElementBarraLateral, setSelectElementBarraLateral] =
     useState(seleccionSeccion);
   const [escuchaPedidos, setEscuchaPedidos] = useState(true);
   const [escuchaPlatosCalientes, setEscuchaPlatosCalientes] = useState(true);
+  const [escuchaPlatoCaliente, setEscuchaPlatoCaliente] = useState(true);
 
 
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -115,22 +126,6 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     const exist = localStorage.getItem('usuario');
     return exist ? true : false;
   });
-  const [loading, setLoading] = useState(false);
-  
-
-  // function login(usuario: Usuario) {
-  //     if (usuario) {
-  //       localStorage.setItem("usuario", JSON.stringify(usuario));
-  //       setAcceso(true);
-  //         let user = localStorage.getItem("usuario");
-  //           setUsuario(JSON.parse(user));
-  //     } else {
-  //       console.warn("No se recibió el token del backend");
-  //       setAcceso(false);
-  //       localStorage.removeItem("usuario");
-  //     }
-    
-  // }
 
   function login(usuario: Usuario | null) {
     if (usuario) {
@@ -163,26 +158,28 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
                   setUsuario(null);
   }
 
-  function HandleActualizarPlatosCalientes(platos: PlatoCaliente[]) {
-    setPlatosCalientes(platos);
-  }
-
   function HandleActualizarPlatoCalienteEspeficico(platoId: string, nuevaCantidadRestante: number) {
+    
     const indice = platosCalientes.findIndex(plato => plato.id === platoId);
     if (indice !== -1) {
       const nuevosPlatosCalientes = [...platosCalientes];
       nuevosPlatosCalientes[indice].cantRestante = nuevaCantidadRestante;
       setPlatosCalientes(nuevosPlatosCalientes);
+    } else if(indice !== -1)  {
+      const nuevosPlatosCalientes = [...platosCalientes];
+      nuevosPlatosCalientes[indice].cantRestante = 0;
     }
   }
-  
-  
 
-  function handleAddArticulo(cantidadRestante: number) {
-    if (cantidadRestante - 1 < 0) {
-      setcantidadArticulosIguales(cantidadArticulosIguales);
-    } else {
-      setcantidadArticulosIguales(cantidadArticulosIguales + 1);
+  function HanddleDevolverTodosLosPlatos(platoId: string, cantidad:number){
+    const indice = platosCalientes.findIndex(plato => plato.id === platoId);
+    if (indice !== -1) {
+      const nuevosPlatosCalientes = [...platosCalientes];
+      nuevosPlatosCalientes[indice].cantRestante = nuevosPlatosCalientes[indice].cantRestante + cantidad;
+      setPlatosCalientes(nuevosPlatosCalientes);
+    } else if(indice !== -1)  {
+      const nuevosPlatosCalientes = [...platosCalientes];
+      nuevosPlatosCalientes[indice].cantRestante = 1;
     }
   }
 
@@ -197,51 +194,47 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     setmostrarVistaSecundaria(!mostrarVistaSecundaria);
   }
 
-  function HandleChargePedidos(data: Pedidos[]) {
-    setlosPedidos(data);
-  }
 
 
   function HandleAddPedido(
     id: string,
     descripcion: string,
     montoTotal: number,
-    cantidadRest: number,
     cantidadAOrdenar: number,
     imagen: string
   ) {
 
-    let nuevoPedido: Pedidos = {
-      tipoProducto:"revisar handle add pedido",
+    let añadirPedido: Pedidos = {
+      idCarrito:"",
+      tipoProducto:"",
       idProducto: id,
       descripcion: descripcion,
-      cantidad: cantidadRest,
       montoTotal: montoTotal,
       imagen: imagen,
       cantidadAOrdenar: cantidadAOrdenar,
     };
 
-    const findProductoExistente = losPedidos.filter(
-      (pedido) => pedido.idProducto === nuevoPedido.idProducto
-    );
+      const findProductoExistente = losPedidos.filter(
+        (pedido) => pedido.idProducto === añadirPedido.idProducto
+      );
+      
+      const buscarPlatoCaliente = platosCalientes.filter(
+        (plato) => plato.id == añadirPedido.idProducto
+      );
 
-    const buscarPlatoCaliente = platosCalientes.filter(
-      (plato) => plato.id == nuevoPedido.idProducto
-    );
+      let montoBase: number = 1;
+      let cantRes:number = 0;
 
-    let montoBase: number = 1;
-    let cantRes:number = 0;
-
-    if (buscarPlatoCaliente) {
-      montoBase = buscarPlatoCaliente[0].precio;
-      cantRes = buscarPlatoCaliente[0].cantRestante;
+         if (buscarPlatoCaliente) {
+            montoBase = buscarPlatoCaliente[0].precio;
+            cantRes = buscarPlatoCaliente[0].cantRestante;
+            añadirPedido.tipoProducto="Plato Caliente";
     }
 
-    if(cantRes-1 < 0 ){
-      console.log("it is not posibble");
-      
-    } else {
+    const auth = Auth();
+
       if (findProductoExistente.length > 0) {
+        
         let elementoAActualizar: Pedidos = findProductoExistente[0];
   
         let actualizar: PedidoActualizar = {
@@ -249,22 +242,130 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
           montoTotal: elementoAActualizar.montoTotal + montoBase,
           cantidadAOrdenar: elementoAActualizar.cantidadAOrdenar + 1,
         };
-  
-        //permite establecer elrecargo del componente
-        setEscuchaPedidos(true);
-        
-  
-        updatePedido(elementoAActualizar.idProducto, actualizar)
+
+        if(auth){
+          updatePedido(auth.idUsuario,elementoAActualizar.idProducto, actualizar)
           .then((data) => {
+            
           })
           .catch((error) => {
             console.error("Error al actualizar el pedido:");
             console.log(error);
           });
+        }
+      } else {
+        if(auth){
+          crearPedido(auth.idUsuario,añadirPedido.idProducto,{
+            cantidadAOrdenar:añadirPedido.cantidadAOrdenar,
+            descripcion:añadirPedido.descripcion,
+            imagen:añadirPedido.imagen,
+            montoTotal:añadirPedido.montoTotal,
+            cantidad:2
+          });
+        }
       }
-    }
+      setEscuchaPedidos(true);
+  }
 
+  function HandleSubPedido(
+    id: string,
+    descripcion: string,
+    montoTotal: number,
+    cantidadAOrdenar: number,
+    imagen: string
+  ){
+    
+    let quitarPedido: Pedidos = {
+      idCarrito:"",
+      tipoProducto:"",
+      idProducto: id,
+      descripcion: descripcion,
+      montoTotal: montoTotal,
+      imagen: imagen,
+      cantidadAOrdenar: cantidadAOrdenar,
+    };
+
+    const findProductoExistente = losPedidos.filter(
+      (pedido) => pedido.idProducto === quitarPedido.idProducto
+    );
+
+    const buscarPlatoCaliente = platosCalientes.filter(
+      (plato) => plato.id == quitarPedido.idProducto
+    );
+
+    let montoBase: number = 1;
+    let cantRes:number = 0;
+
+
+    if (buscarPlatoCaliente) {
+      montoBase = buscarPlatoCaliente[0].precio;
+      cantRes = buscarPlatoCaliente[0].cantRestante;
+      quitarPedido.tipoProducto="Plato Caliente";
+
+      
+}
+
+const auth = Auth();
+
+if (findProductoExistente.length > 0) {
+        
+  let elementoAActualizar: Pedidos = findProductoExistente[0];
   
+  if(elementoAActualizar.cantidadAOrdenar -1 < 1){
+
+
+
+
+    console.log("it is imposibble");
+    if(auth){
+
+      deletePedidoMedianteUsuario(auth.idUsuario,elementoAActualizar.idProducto)
+      .then((data) => {
+        
+      })
+      .catch((error) => {
+        console.error("Error al actualizar el pedido:");
+        console.log(error);
+      });
+
+    }  
+
+
+
+
+    
+  } else {
+
+    let actualizar: PedidoActualizar = {
+      descripcion: elementoAActualizar.descripcion,
+      montoTotal: elementoAActualizar.montoTotal + montoBase,
+      cantidadAOrdenar: elementoAActualizar.cantidadAOrdenar - 1,
+    };
+
+ if(auth){
+    updatePedido(auth.idUsuario,elementoAActualizar.idProducto, actualizar)
+    .then((data) => {
+      
+    })
+    .catch((error) => {
+      console.error("Error al actualizar el pedido:");
+      console.log(error);
+    });
+  }
+
+  }
+  
+
+  setEscuchaPedidos(true);
+}
+
+
+
+
+
+
+
+
   }
 
   function handleVerOcultarContenido(status: boolean) {
@@ -300,16 +401,20 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
         mostrarVistaSecundaria: mostrarVistaSecundaria,
         HandlevisibilidadBarraLateral: HandlevisibilidadBarraLateral,
         HandleHacerVisibleSecundaria: HandleHacerVisibleSecundaria,
-        HandleChargePedidos: HandleChargePedidos,
         platosCalientes: platosCalientes,
-        HandleActualizarPlatosCalientes: HandleActualizarPlatosCalientes,
+        setPlatosCalientes:setPlatosCalientes,
         losPedidos: losPedidos,
+        setlosPedidos:setlosPedidos,
         HandleActualizarPlatoCalienteEspeficico:HandleActualizarPlatoCalienteEspeficico,
+        HanddleDevolverTodosLosPlatos:HanddleDevolverTodosLosPlatos,
         escuchaPedidos: escuchaPedidos,
         setEscuchaPedidos: setEscuchaPedidos,
+        escuchaPlatosCalientes: escuchaPlatosCalientes,
+        setEscuchaPlatosCalientes: setEscuchaPlatosCalientes,
+        escuchaPlatoCaliente: escuchaPlatoCaliente,
+        setEscuchaPlatoCaliente: setEscuchaPlatoCaliente,
         HandleAddPedido: HandleAddPedido,
-        handleAddArticulo: handleAddArticulo,
-        direcciones: direcciones,
+        HandleSubPedido:HandleSubPedido,
         handleVerOcultarContenido: handleVerOcultarContenido,
         verOcultarRestoDeSeccion: verOcultarRestoDeSeccion,
         selectElementBarraLateral: selectElementBarraLateral,

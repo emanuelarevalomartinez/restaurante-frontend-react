@@ -6,8 +6,10 @@ import { AcercaDe } from '../AcercaDe/AceraDe'
 import { useContext } from 'react'
 import { Contexto } from '../Contexto'
 import { Notificaciones } from '../Notificaciones/Notificaciones'
-import { Cargando } from '../Cargando'
 import { EditarProductos, RechasoEditarProductos } from '../EditarProductos'
+import { Configuracion } from '../Configuracion'
+import { Ordenes } from '../Ordenes'
+import { Cargando } from '../common'
 
 export function VistaPrincipal() {
 
@@ -32,6 +34,8 @@ const { verOcultarRestoDeSeccion } = useContext(Contexto);
                         <Route path='/Notificaciones' element={<Notificaciones />} />
                         <Route path='/EditarProductos' element={<EditarProductos />} />
                         <Route path='/RechasoEditarProductos' element={<RechasoEditarProductos />} />
+                        <Route path='/Ordenes' element={<Ordenes />} />
+                        <Route path='/Configuracion' element={<Configuracion />} />
                         <Route path='/Cargando' element={<Cargando />} />
                     </Routes>
                 </nav>

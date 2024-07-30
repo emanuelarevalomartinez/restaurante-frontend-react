@@ -2,7 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { RiAddLine, RiSubtractFill, RiSubtractLine } from "react-icons/ri";
 import { Contexto } from "../../../Contexto";
 import { PlatoCalienteActualizar } from "../../../Interfaces";
-import { updatePlatosCalientes } from ".";
+import { Cargando } from "../../../common";
+import { getUnPlato, updatePlatoCaliente } from ".";
 
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
@@ -20,56 +21,112 @@ export function PLato({ children, identificador, nombreProducto, precio, cantida
     const [overAumentar, setoverAumentar] = useState(false);
     const [cantidadRest, setcantidadRest] = useState(cantidadRestante);
     const [cantidadAOrdenar] = useState(1)
-    const [probar, setprobar] = useState(false);
-    const [probar2, setprobar2] = useState(false);
-    const { HandleAddPedido,HandleActualizarPlatoCalienteEspeficico,platosCalientes } = useContext(Contexto);
+    const [addPedido, setAddPedido] = useState(false);
+    const [removePedido, setRemovePedido] = useState(false);
+    const { HandleAddPedido,HandleActualizarPlatoCalienteEspeficico,HandleSubPedido,losPedidos,escuchaPlatoCaliente,setEscuchaPlatoCaliente } = useContext(Contexto);
 
-    
+
     useEffect(() => {
-        if(probar){
+        if(escuchaPlatoCaliente){
+
+           const obtenerUnPlato = async ()=> {
+            const platoObtenido = await getUnPlato(identificador);
+             if(platoObtenido){
+                 setcantidadRest(platoObtenido.cantRestante);
+             }
+            
+               setEscuchaPlatoCaliente(false);
+           }
+           obtenerUnPlato();
+        }
+    }, [escuchaPlatoCaliente])
+    useEffect(() => {
+        if(addPedido){
             const actualizarPlato = async () => {
-            const nuevoPlato:PlatoCalienteActualizar = await updatePlatosCalientes(identificador,{
-                cantRestante: cantidadRest-1,
-            });
-            if(nuevoPlato.id){
-                HandleActualizarPlatoCalienteEspeficico(nuevoPlato.id,nuevoPlato.cantRestante);
-            }
-            setcantidadRest(nuevoPlato.cantRestante);
+                if(cantidadRest-1 < 0 ){
+                    console.log("imposible");
+
+                } else {
+
+                    const nuevoPlato:PlatoCalienteActualizar = await updatePlatoCaliente(identificador,{
+                        cantRestante: cantidadRest-1,
+                        
+                    });
+                    if(nuevoPlato.id){
+                        HandleActualizarPlatoCalienteEspeficico(nuevoPlato.id,nuevoPlato.cantRestante);
+                            }
+                            setcantidadRest(nuevoPlato.cantRestante);
+                }
         }
         actualizarPlato();
         }
-        setprobar(false);
+        setAddPedido(false);
    
-  }, [probar])
+  }, [addPedido])
 
 
   useEffect(() => {
-    if(probar2){
+    if(removePedido){
         const actualizarPlato = async () => {
-        const nuevoPlato:PlatoCalienteActualizar = await updatePlatosCalientes(identificador,{
-            cantRestante: cantidadRest+1,
-        });
-        if(nuevoPlato.id){
-            HandleActualizarPlatoCalienteEspeficico(nuevoPlato.id,nuevoPlato.cantRestante);
-        }
-        setcantidadRest(nuevoPlato.cantRestante);
+            let nuevoPlato:PlatoCalienteActualizar;
+            const findProductoExistente = losPedidos.filter(
+                (pedido) => pedido.idProducto === identificador
+              );
+              if(findProductoExistente.length > 0){
+                  nuevoPlato = await updatePlatoCaliente(identificador,{
+                      cantRestante: cantidadRest+1,
+                  });
+                  if(nuevoPlato.id){
+                      HandleActualizarPlatoCalienteEspeficico(nuevoPlato.id,nuevoPlato.cantRestante);
+                  }
+                  setcantidadRest(nuevoPlato.cantRestante);
+              } else {
+
+              }
     }
     actualizarPlato();
     }
-    console.log(platosCalientes);
     
-    setprobar2(false);
-  }, [probar2])
+    setRemovePedido(false);
+  }, [removePedido])
   
   
 
-  if(probar || probar2){
+  if(addPedido && cantidadRest-1 > 0  || removePedido && cantidadRest-1 > 0){
      return(
         <div  className="bg-[#1F1D2B] w-auto lg:w-48 xl:w-auto p-8 rounded-xl flex flex-col items-center my-2 gap-2 text-center text-gray-300">
-           <p className="text-xl text-red-500">Cargando...</p>
+       <div className="w-40 h-32 -mt-20 items-center bg-[#37334d] flex flex-col justify-center rounded-full ">
+          <Cargando/>
+        </div>
+           <p className="text-xl"></p>
+            <span className="text-gray-400"></span>
+            <div className=" flex gap-2 h-full w-full justify-around items-center">
+                <button
+                    onMouseEnter={() => setoverDisminuir(true)}
+                    onMouseLeave={() => setoverDisminuir(false)}
+                    disabled={true}
+                    className={`mx-1 rounded-md border text-red-500 border-red-500 p-2 ${overDisminuir ? 'bg-red-500 text-white' : ''} flex items-center justify-center`}
+                >
+                    {overDisminuir ? <RiSubtractFill /> : <RiSubtractLine />}
+                </button>
+
+                <p className="text-gray-600">0</p>
+
+                <button
+                    onMouseEnter={() => setoverAumentar(true)}
+                    onMouseLeave={() => setoverAumentar(false)}
+                    disabled={true}
+                    className={`mx-1 rounded-md border text-blue-500 border-blue-500 p-2 ${overAumentar ? 'bg-blue-500 text-white' : ''} flex items-center justify-center`}
+                >
+                    {overAumentar ? <RiAddLine /> : <RiAddLine />}
+                </button>
+            </div>
         </div>
      )
   }
+
+  //* tengo que añadir el nuevo pedido al arreglo de pedidos
+  //*  evitar actualizar el plato cuando la cantidad sea menor que 0
     
 
     return (
@@ -81,14 +138,12 @@ export function PLato({ children, identificador, nombreProducto, precio, cantida
                 <button
                     onMouseEnter={() => setoverDisminuir(true)}
                     onMouseLeave={() => setoverDisminuir(false)}
-                    className={`mx-1 rounded-md border text-red-500 border-red-500 p-2 ${overDisminuir ? 'bg-red-500 text-white border-none' : ''} flex items-center justify-center`}
+                    disabled={removePedido}
+                    className={`mx-1 rounded-md border text-red-500 border-red-500 p-2 ${overDisminuir ? 'bg-red-500 text-white' : ''} flex items-center justify-center`}
                     onClick={() => { 
-                        // handleAumentarCantidadRestante();
-                        // HandleSubPedido(identificador,cantidadInicial,nombreProducto,precio,cantidadRest,cantidadAOrdenar,direccionImagen);
-                        // handleSubArticulo(cantidadRest,cantidadInicial);
-                        console.log("hola probar 2");
-                        
-                        setprobar2(true);
+                        HandleSubPedido(identificador,nombreProducto,precio,cantidadAOrdenar,direccionImagen);
+                        setRemovePedido(true);
+
                     }}
                 >
                     {overDisminuir ? <RiSubtractFill /> : <RiSubtractLine />}
@@ -99,11 +154,14 @@ export function PLato({ children, identificador, nombreProducto, precio, cantida
                 <button
                     onMouseEnter={() => setoverAumentar(true)}
                     onMouseLeave={() => setoverAumentar(false)}
-                    className={`mx-1 rounded-md border text-blue-500 border-blue-500 p-2 ${overAumentar ? 'bg-blue-500 text-white border-none' : ''} flex items-center justify-center`}
+                    disabled={addPedido}
+                    className={`mx-1 rounded-md border text-blue-500 border-blue-500 p-2 ${overAumentar ? 'bg-blue-500 text-white' : ''} flex items-center justify-center`}
                     onClick={() => { 
-                        setprobar(true);
+                        setAddPedido(true);
                         // HandleDisminuirCantPlatos(identificador,data);
-                        HandleAddPedido(identificador,nombreProducto,precio,cantidadRest,cantidadAOrdenar,direccionImagen);
+                        if(cantidadRest > 0){
+                            HandleAddPedido(identificador,nombreProducto,precio,cantidadAOrdenar,direccionImagen);
+                        }
                      }}
                 >
                     {overAumentar ? <RiAddLine /> : <RiAddLine />}

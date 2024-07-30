@@ -56,7 +56,7 @@ const navigate = useNavigate();
                         <A selected={ selectElementBarraLateral[2].seleccionado }
                         onClick={()=> {
                             handleVerOcultarContenido(true);
-                            navigate("/Cargando");
+                            navigate("/Ordenes");
                             handleChangeSelecionBarraLateral("carrito");
                             // carrito
                         }}>
@@ -97,7 +97,7 @@ const navigate = useNavigate();
                         <A selected={ selectElementBarraLateral[5].seleccionado } 
                         onClick={()=> {
                             handleVerOcultarContenido(true);
-                            navigate("/Cargando");
+                            navigate("/Configuracion");
                             handleChangeSelecionBarraLateral("configuracion");
                             // ajustes
                         }}>
