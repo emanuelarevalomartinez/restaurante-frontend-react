@@ -1,5 +1,5 @@
 
-import { FacebookIcon, InstagramIcon, TwitterIcon } from ".";
+import { FacebookIcon, InstagramIcon, TelegramIcon, TwitterIcon } from ".";
 import { ImputGlobal, LabelGlobal } from "../common";
 
 
@@ -69,13 +69,14 @@ export function AcercaDe() {
               </a>
               <p className="my-5 leading-normal">
                 Roberto Reyes Calle #16, Entre 1ra y Manuel del Socorro.
-                <br />
+                <br/>
                 Bayamo, Granma, Cuba.
               </p>
               <span className="inline-flex">
                  <FacebookIcon/>
                  <TwitterIcon/>
                  <InstagramIcon/>
+                 <TelegramIcon/>
               </span>
             </div>
           </div>

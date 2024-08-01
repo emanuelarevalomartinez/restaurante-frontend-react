@@ -7,8 +7,11 @@ import {
   Usuario,
 } from "./Interfaces";
 import { seleccionSeccion } from ".";
-import { crearPedido, deletePedidoMedianteUsuario, updatePedido } from "./VistaPrincipal/PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios";
+import { crearPedido, deletePedidoMedianteUsuario, getUnPedidoPorUsuario, updatePedido } from "./VistaPrincipal/PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios";
 import { Auth } from "./Autentificacion/Auth";
+import { Bebida } from "./Interfaces/Bebida";
+import { getPlatosCalientes, updatePlatoCaliente } from "./VistaPrincipal/PaginasVistaPrincipal/UI";
+import { getBebidas, updateBebida } from "./VistaPrincipal/PaginasVistaPrincipal";
 
 // estoy trabajando en el backend en ver como establecer las relaciones del  usuario
 // si es usuario o administrador
@@ -27,12 +30,16 @@ interface ContextoProps {
   setPlatosCalientes: (e: PlatoCaliente[]) => void;
   losPedidos: Pedidos[];
   setlosPedidos:(e: Pedidos[])=> void;
+  lasBebidas: Bebida[];
+  setLasBebidas:(e: Bebida[])=> void;
   HandleActualizarPlatoCalienteEspeficico: (e: string, f:number)=> void;
   HanddleDevolverTodosLosPlatos: (e: string, f:number)=> void;
   escuchaPedidos: boolean;
   setEscuchaPedidos: (e: boolean) => void;
   escuchaPlatosCalientes: boolean;
   setEscuchaPlatosCalientes: (e: boolean) => void;
+  escuchaBebidas: boolean;
+  setEscuchaBebidas: (e: boolean) => void;
   escuchaPlatoCaliente: boolean;
   setEscuchaPlatoCaliente: (e: boolean) => void;
   HandleAddPedido: (
@@ -40,14 +47,16 @@ interface ContextoProps {
     descripcion: string,
     cantidad: number,
     cantidadAOrdenar: number,
-    imagen: string
+    imagen: string,
+    cantRestante:number,
   ) => void;
   HandleSubPedido: (
     id: string,
     descripcion: string,
     cantidad: number,
     cantidadAOrdenar: number,
-    imagen: string
+    imagen: string,
+    cantRestante:number,
   ) => void;
   handleVerOcultarContenido: (e: boolean) => void;
   verOcultarRestoDeSeccion: boolean;
@@ -75,12 +84,16 @@ const defaultContext: ContextoProps = {
   setPlatosCalientes: ()=> {},
   losPedidos: [],
   setlosPedidos: ()=> {},
+  lasBebidas: [],
+  setLasBebidas: ()=> {},
   HandleActualizarPlatoCalienteEspeficico: ()=> {},
   HanddleDevolverTodosLosPlatos: ()=> {},
   escuchaPedidos: true,
   setEscuchaPedidos: () => {},
   escuchaPlatosCalientes: true,
   setEscuchaPlatosCalientes: () => {},
+  escuchaBebidas: true,
+  setEscuchaBebidas: () => {},
   escuchaPlatoCaliente: true,
   setEscuchaPlatoCaliente: ()=> {},
   HandleAddPedido: () => {},
@@ -89,7 +102,7 @@ const defaultContext: ContextoProps = {
   verOcultarRestoDeSeccion: false,
   selectElementBarraLateral: [
     {
-      nombre: "home",
+      nombre: "/",
       seleccionado: true,
     },
   ],
@@ -112,12 +125,14 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     useState<boolean>(false);
   const [platosCalientes, setPlatosCalientes] = useState<PlatoCaliente[]>([]);
   const [losPedidos, setlosPedidos] = useState<Pedidos[]>([]);
+  const [lasBebidas, setLasBebidas] = useState<Bebida[]>([]);
   const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] =
     useState(false);
   const [selectElementBarraLateral, setSelectElementBarraLateral] =
     useState(seleccionSeccion);
   const [escuchaPedidos, setEscuchaPedidos] = useState(true);
   const [escuchaPlatosCalientes, setEscuchaPlatosCalientes] = useState(true);
+  const [escuchaBebidas, setEscuchaBebidas] = useState(true);
   const [escuchaPlatoCaliente, setEscuchaPlatoCaliente] = useState(true);
 
 
@@ -148,6 +163,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     } else {
       console.warn("No se recibió el token del backend");
       setAcceso(false);
+      localStorage.removeItem('posicionBarraNavegacion');
       localStorage.removeItem("usuario");
     }
   }
@@ -201,7 +217,8 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     descripcion: string,
     montoTotal: number,
     cantidadAOrdenar: number,
-    imagen: string
+    imagen: string,
+    cantRestante:number,
   ) {
 
     let añadirPedido: Pedidos = {
@@ -212,6 +229,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
       montoTotal: montoTotal,
       imagen: imagen,
       cantidadAOrdenar: cantidadAOrdenar,
+      cantRestante:cantRestante,
     };
 
       const findProductoExistente = losPedidos.filter(
@@ -222,20 +240,29 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
         (plato) => plato.id == añadirPedido.idProducto
       );
 
+      const buscarBebida = lasBebidas.filter(
+        (bebida) => bebida.idBebida == añadirPedido.idProducto
+      );
+
       let montoBase: number = 1;
       let cantRes:number = 0;
 
-         if (buscarPlatoCaliente) {
+         if (buscarPlatoCaliente.length !== 0) {
             montoBase = buscarPlatoCaliente[0].precio;
             cantRes = buscarPlatoCaliente[0].cantRestante;
             añadirPedido.tipoProducto="Plato Caliente";
     }
+     if (buscarBebida.length !== 0) {
+            montoBase = buscarBebida[0].precio;
+            cantRes = buscarBebida[0].cantRestante;
+            añadirPedido.tipoProducto="Bebida";
+    }
 
     const auth = Auth();
 
-      if (findProductoExistente.length > 0) {
-        
+    if (findProductoExistente.length !== 0) {
         let elementoAActualizar: Pedidos = findProductoExistente[0];
+        
   
         let actualizar: PedidoActualizar = {
           descripcion: elementoAActualizar.descripcion,
@@ -245,23 +272,73 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
 
         if(auth){
           updatePedido(auth.idUsuario,elementoAActualizar.idProducto, actualizar)
-          .then((data) => {
-            
+          .then( async () => {
+            if(buscarPlatoCaliente.length !== 0){
+
+              await updatePlatoCaliente(elementoAActualizar.idProducto,{
+                cantRestante: cantRestante - 1,
+              })
+              .then( async ()=> {
+                await getPlatosCalientes()
+                .then( (data)=> {
+                  setPlatosCalientes(data);
+                  setEscuchaPlatosCalientes(true);
+                } )
+              } )
+            } else if(buscarBebida.length !== 0){
+              await updateBebida(elementoAActualizar.idProducto,{
+                cantRestante: cantRestante - 1,
+              })
+              .then( async ()=> {
+                await getBebidas()
+                .then( (data)=> {
+                  setLasBebidas(data);
+                  setEscuchaPlatosCalientes(true);
+                } )
+              } )
+            }
           })
           .catch((error) => {
-            console.error("Error al actualizar el pedido:");
+            console.error("Error al tratar de aumentar pedido");
             console.log(error);
           });
         }
       } else {
+        
         if(auth){
-          crearPedido(auth.idUsuario,añadirPedido.idProducto,{
-            cantidadAOrdenar:añadirPedido.cantidadAOrdenar,
+          crearPedido(auth.idUsuario,id,{
+            cantidadAOrdenar:1,
             descripcion:añadirPedido.descripcion,
             imagen:añadirPedido.imagen,
             montoTotal:añadirPedido.montoTotal,
-            cantidad:2
-          });
+          })
+          .then( async ()=> {
+            //* tengo que resolver lo de crear un nuevo pedido sin que se duplique con copilot
+            //* ver por que cuando presiono en bebidas + se qeda cagando
+            if(buscarPlatoCaliente.length !== 0){
+              await updatePlatoCaliente(id,{
+                cantRestante: cantRestante - 1,
+              })
+              .then( async ()=> {
+                await getPlatosCalientes()
+                .then( (data)=> {
+                  setPlatosCalientes(data);
+                  setEscuchaPlatosCalientes(true);
+                } )
+              } )
+            } else {
+                await updateBebida(id,{
+                  cantRestante: cantRestante - 1,
+                })
+                .then( async ()=> {
+                  await getBebidas()
+                  .then( (data)=> {
+                    setLasBebidas(data);
+                    setEscuchaPlatosCalientes(true);
+                  } )
+                } )
+            }
+          } )
         }
       }
       setEscuchaPedidos(true);
@@ -272,7 +349,8 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     descripcion: string,
     montoTotal: number,
     cantidadAOrdenar: number,
-    imagen: string
+    imagen: string,
+    cantRestante:number,
   ){
     
     let quitarPedido: Pedidos = {
@@ -283,6 +361,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
       montoTotal: montoTotal,
       imagen: imagen,
       cantidadAOrdenar: cantidadAOrdenar,
+      cantRestante:cantRestante,
     };
 
     const findProductoExistente = losPedidos.filter(
@@ -293,76 +372,131 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
       (plato) => plato.id == quitarPedido.idProducto
     );
 
+    const buscarBebida = lasBebidas.filter(
+      (bebida) => bebida.idBebida == quitarPedido.idProducto
+    );
+
     let montoBase: number = 1;
     let cantRes:number = 0;
 
 
-    if (buscarPlatoCaliente) {
+    if (buscarPlatoCaliente.length !== 0) {
       montoBase = buscarPlatoCaliente[0].precio;
       cantRes = buscarPlatoCaliente[0].cantRestante;
       quitarPedido.tipoProducto="Plato Caliente";
-
-      
+}
+if (buscarBebida.length !== 0) {
+      montoBase = buscarBebida[0].precio;
+      cantRes = buscarBebida[0].cantRestante;
+      quitarPedido.tipoProducto="Bebida";
 }
 
 const auth = Auth();
 
-if (findProductoExistente.length > 0) {
+if (findProductoExistente.length !== 0) {
         
   let elementoAActualizar: Pedidos = findProductoExistente[0];
   
-  if(elementoAActualizar.cantidadAOrdenar -1 < 1){
+  let actualizar: PedidoActualizar = {
+    descripcion: elementoAActualizar.descripcion,
+    montoTotal: elementoAActualizar.montoTotal + montoBase,
+    cantidadAOrdenar: elementoAActualizar.cantidadAOrdenar - 1,
+  };
 
+  if(auth){
 
+    getUnPedidoPorUsuario(auth.idUsuario,elementoAActualizar.idProducto)
+    .then( (data)=> {
+         const datos = data.cantidadAOrdenar;
+         
+         if(datos - 1 < 1 ){
 
+          
+            deletePedidoMedianteUsuario(auth.idUsuario,id)
+            .then( async ()=> {
+              //* 
+              if(buscarPlatoCaliente.length !== 0){
+                console.log("perro");
+                
+                await updatePlatoCaliente(id,{
+                  cantRestante: cantRestante + 1,
+                })
+                .then( async ()=> {
+                  await getPlatosCalientes()
+                  .then( (data)=> {
+                    setPlatosCalientes(data);
+                    setEscuchaPedidos(true);
+                    setEscuchaPlatosCalientes(true);
+                  } )
+                } )
+              } else if(buscarBebida.length !== 0){
+                 console.log("hoolaaaaaa");
+                 //*
+                 await updateBebida(id,{
+                  cantRestante: cantRestante + 1,
+                })
+                .then( async ()=> {
+                  await getBebidas()
+                  .then( (data)=> {
+                    setLasBebidas(data);
+                    setEscuchaPedidos(true);
+                    setEscuchaPlatosCalientes(true);
+                  } )
+                } )
+                 //*
+              }
+            } )
+          //*
 
-    console.log("it is imposibble");
-    if(auth){
+         } else {
+          
+             updatePedido(auth.idUsuario,elementoAActualizar.idProducto, actualizar)
+    .then( async () => {
+      if(buscarPlatoCaliente.length !== 0){
+        await updatePlatoCaliente(elementoAActualizar.idProducto,{
+          cantRestante: cantRestante + 1,
+        })
+        .then( async ()=> {
+          await getPlatosCalientes()
+          .then( (data)=> {
+            setPlatosCalientes(data);
+            setEscuchaPlatosCalientes(true);
+          } )
+        } )
+      } else if(buscarBebida.length !== 0){
+        console.log("nuevo");
+        //*
+        await updateBebida(elementoAActualizar.idProducto,{
+          cantRestante: cantRestante + 1,
+        })
+        .then( async ()=> {
+          await getBebidas()
+          .then( (data)=> {
+            setLasBebidas(data);
+            setEscuchaPlatosCalientes(true);
+          } )
+        } )
+        //*
 
-      deletePedidoMedianteUsuario(auth.idUsuario,elementoAActualizar.idProducto)
-      .then((data) => {
-        
-      })
-      .catch((error) => {
-        console.error("Error al actualizar el pedido:");
-        console.log(error);
-      });
+      }
+    })
+    .catch((error) => {
+      console.error("Error al tratar de disminuir el pedido");
+      console.log(error);
+    });
 
-    }  
+    setEscuchaPedidos(true);
 
+  }
+    } )
 
+  }
 
 
     
   } else {
 
-    let actualizar: PedidoActualizar = {
-      descripcion: elementoAActualizar.descripcion,
-      montoTotal: elementoAActualizar.montoTotal + montoBase,
-      cantidadAOrdenar: elementoAActualizar.cantidadAOrdenar - 1,
-    };
-
- if(auth){
-    updatePedido(auth.idUsuario,elementoAActualizar.idProducto, actualizar)
-    .then((data) => {
-      
-    })
-    .catch((error) => {
-      console.error("Error al actualizar el pedido:");
-      console.log(error);
-    });
-  }
-
-  }
-  
-
-  setEscuchaPedidos(true);
 }
-
-
-
-
-
 
 
 
@@ -405,12 +539,16 @@ if (findProductoExistente.length > 0) {
         setPlatosCalientes:setPlatosCalientes,
         losPedidos: losPedidos,
         setlosPedidos:setlosPedidos,
+        lasBebidas: lasBebidas,
+        setLasBebidas:setLasBebidas,
         HandleActualizarPlatoCalienteEspeficico:HandleActualizarPlatoCalienteEspeficico,
         HanddleDevolverTodosLosPlatos:HanddleDevolverTodosLosPlatos,
         escuchaPedidos: escuchaPedidos,
         setEscuchaPedidos: setEscuchaPedidos,
         escuchaPlatosCalientes: escuchaPlatosCalientes,
         setEscuchaPlatosCalientes: setEscuchaPlatosCalientes,
+        escuchaBebidas: escuchaBebidas,
+        setEscuchaBebidas: setEscuchaBebidas,
         escuchaPlatoCaliente: escuchaPlatoCaliente,
         setEscuchaPlatoCaliente: setEscuchaPlatoCaliente,
         HandleAddPedido: HandleAddPedido,

@@ -1,6 +1,6 @@
 import {  Route, Routes } from 'react-router-dom'
 import { Cabecera } from '../Cabecera'
-import { Parrilla, PlatosCalientes, PlatosFrios, Sopa } from './PaginasVistaPrincipal/'
+import {  PlatosCalientes, PlatosFrios, Bebidas,Postres } from './PaginasVistaPrincipal/'
 import { BarraDeNavegacion } from '../BaarraDeNavegacion'
 import { AcercaDe } from '../AcercaDe/AceraDe'
 import { useContext } from 'react'
@@ -26,10 +26,11 @@ const { verOcultarRestoDeSeccion } = useContext(Contexto);
             </div>
                 <nav className={`lg:pl-28 mx-0 ${verOcultarRestoDeSeccion? "md:mt-20 mt-36" : "md:mt-48 mb-20 mt-60"}`}>
                     <Routes>
-                        <Route path='/' element={<PlatosCalientes />} />
+                        <Route path='/' index element={<PlatosCalientes />} />
                         <Route path='/PlatosFrios' element={<PlatosFrios />} />
-                        <Route path='/Sopas' element={<Sopa />} />
-                        <Route path='/Parrilladas' element={<Parrilla />} />
+                        <Route path='/Bebidas' element={<Bebidas />} />
+                        <Route path='/Postres' element={<Postres />} />
+
                         <Route path='/AcercaDe' element={<AcercaDe />} />
                         <Route path='/Notificaciones' element={<Notificaciones />} />
                         <Route path='/EditarProductos' element={<EditarProductos />} />

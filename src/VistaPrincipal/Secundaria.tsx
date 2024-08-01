@@ -89,7 +89,7 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
                   <Pedido
                     key={index}
                     identificador={pedido.idCarrito}
-                    identificadorPlato={pedido.idProducto}
+                    identificadorProducto={pedido.idProducto}
                     descripcion={pedido.descripcion}
                     montoTotal={pedido.montoTotal}
                     imagen={pedido.imagen}

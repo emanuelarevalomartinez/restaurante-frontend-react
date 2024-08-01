@@ -2,7 +2,7 @@
 
 export function FacebookIcon(){
     return(
-    <a href="https://www.facebook.com/emanuelarevalomartinez" 
+    <a href="https://www.facebook.com/emanueldavidarevalomartinez" 
     target="_blank" 
     rel="noopener noreferrer" 
     className="text-gray-500 inline-flex items-center space-x-2">

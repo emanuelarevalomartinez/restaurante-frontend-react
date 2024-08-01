@@ -32,7 +32,8 @@ const navigate = useNavigate();
                         onClick={()=> {
                             handleVerOcultarContenido(false);
                             navigate("/");
-                            handleChangeSelecionBarraLateral("home");
+                            localStorage.setItem("posicionBarraNavegacion", JSON.stringify(0));
+                            handleChangeSelecionBarraLateral("/");
                         }}>
                             <RiHome6Line className="text-2xl"/>
                         </A>

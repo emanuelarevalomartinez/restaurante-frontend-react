@@ -1,4 +1,5 @@
 export * from './PlatosCalientes'
 export * from './PlatosFrios'
-export * from './Sopa'
-export * from './Parrilla'
+export * from './Bebidas'
+export * from './Postres'
+export * from './las-bebidas.servicios'

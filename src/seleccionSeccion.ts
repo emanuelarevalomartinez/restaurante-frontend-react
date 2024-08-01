@@ -3,7 +3,7 @@ import { SeleccionSeccion } from "./Interfaces";
 
 export const seleccionSeccion: SeleccionSeccion[] = [
     {
-    nombre: "home",
+    nombre: "/",
     seleccionado: true,
     },
     {

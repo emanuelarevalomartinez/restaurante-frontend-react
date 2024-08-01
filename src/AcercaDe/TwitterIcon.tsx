@@ -3,7 +3,7 @@
 export function TwitterIcon(){
     return(
         <a
-      href="https://twitter.com/emanuelarevalomartinez"
+      href="https://twitter.com/EmanuelArMart"
       target="_blank"
       rel="noopener noreferrer"
       className="ml-4 text-gray-500"

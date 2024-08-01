@@ -8,4 +8,5 @@ export interface Pedidos{
     imagen:string;
     tipoProducto:string;
     cantidadAOrdenar:number;
+    cantRestante:number;
 }

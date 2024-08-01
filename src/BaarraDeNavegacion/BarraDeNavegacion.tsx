@@ -1,6 +1,7 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Contexto } from "../Contexto";
+import { Auth } from "../Autentificacion/Auth";
 
 
 export function BarraDeNavegacion() {
@@ -12,19 +13,42 @@ export function BarraDeNavegacion() {
     let estiloNormal: string = "mx-2 flex flex-nowrap";
     const [estadoSeleccion, setestadoSeleccion] = useState(0);
 
+    const auth = Auth();
+
+    const { verOcultarRestoDeSeccion } = useContext(Contexto);
+
+useEffect(() => {
+
+    if(auth){
+        const posicion = localStorage.getItem('posicionBarraNavegacion');
+        if(posicion){
+            const parsear= JSON.parse(posicion);
+            setestadoSeleccion(parsear);
+        } else {
+            setestadoSeleccion(0);
+        }
+    }
+
+}, [verOcultarRestoDeSeccion])
+
+
+
     function HandleCambiarEstado(nuevoEstado: number) {
         if (nuevoEstado == 0) {
+            localStorage.setItem("posicionBarraNavegacion", JSON.stringify(0));
             setestadoSeleccion(0);
         } else if (nuevoEstado == 1) {
+            localStorage.setItem("posicionBarraNavegacion", JSON.stringify(1));
             setestadoSeleccion(1);
         } else if (nuevoEstado == 2) {
+            localStorage.setItem("posicionBarraNavegacion", JSON.stringify(2));
             setestadoSeleccion(2);
         } else {
+            localStorage.setItem("posicionBarraNavegacion", JSON.stringify(3));
             setestadoSeleccion(3);
         }
     }
 
-    const { verOcultarRestoDeSeccion } = useContext(Contexto);
 
     return (
         <nav className={`${verOcultarRestoDeSeccion? "hidden" : "flex overflow-x-auto sm:overflow-x-hidden text-gray-300 justify-start sm:justify-around mb-6 scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-10"}`}>
@@ -39,12 +63,12 @@ export function BarraDeNavegacion() {
                 className={estadoSeleccion == 1 ? platosFrios : estiloNormal}> <span className="mr-2">Platos</span> <span>Fríos</span>
             </Link>
             <Link 
-                to="/Sopas"
+                to="/Bebidas"
                 onClick={() => { HandleCambiarEstado(2) }}
                 className={estadoSeleccion == 2 ? bebidas : estiloNormal}> Bebidas
             </Link>
             <Link 
-                to="/Parrilladas"
+                to="/Postres"
                 onClick={() => { HandleCambiarEstado(3) }}
                 className={estadoSeleccion == 3 ? postres : estiloNormal}> Postres
             </Link>

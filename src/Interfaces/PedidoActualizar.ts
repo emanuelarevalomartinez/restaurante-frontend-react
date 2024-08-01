@@ -1,6 +1,6 @@
 
 export interface PedidoCrear{
-    cantidad:number;
+ 
    descripcion:string;
    montoTotal:number;
    imagen:string;

@@ -3,7 +3,7 @@
 export function InstagramIcon(){
     return(
         <a
-      href="https://www.instagram.com/emanuelarevalomartinez"
+      href="https://www.instagram.com/emanueldavidarevalomartinez"
       target="_blank"
       rel="noopener noreferrer"
       className="ml-4 text-gray-500"

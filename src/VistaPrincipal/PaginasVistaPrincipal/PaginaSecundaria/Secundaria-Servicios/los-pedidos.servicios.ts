@@ -14,18 +14,30 @@ export async function getLosPedidos(idUsuario : string){
         return [];
     }
 }
-// export async function getUnPedido(idCarrito : string){
+export async function getUnPedido(idCarrito : string){
   
 
-//     try {
-//         const response = await fetch(`http://localhost:3000/api/carrito-usuario/obtenerUnCarrito/${idCarrito}`);
-//         const data = await response.json();
-//         return data;
-//     } catch (error) {
-//         console.log(error);
-//         return [];
-//     }
-// }
+    try {
+        const response = await fetch(`http://localhost:3000/api/carrito-usuario/obtenerUnCarrito/${idCarrito}`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+}
+export async function getUnPedidoPorUsuario(idUsuario : string,idProducto: string){
+  
+
+    try {
+        const response = await fetch(`http://localhost:3000/api/carrito-usuario/${idUsuario}/${idProducto}`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.log(error);
+        return [];
+    }
+}
 
 export async function crearPedido(idUsuario: string, idProducto: string, nuevoPedido: PedidoCrear){
   try {
