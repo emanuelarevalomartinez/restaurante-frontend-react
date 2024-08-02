@@ -3,6 +3,8 @@ import {
   PedidoActualizar,
   Pedidos,
   PlatoCaliente,
+  PlatoFrio,
+  Postre,
   SeleccionSeccion,
   Usuario,
 } from "./Interfaces";
@@ -32,6 +34,10 @@ interface ContextoProps {
   setlosPedidos:(e: Pedidos[])=> void;
   lasBebidas: Bebida[];
   setLasBebidas:(e: Bebida[])=> void;
+  losPlatosFrios: PlatoFrio[];
+  setLosPlatosFrios:(e: PlatoFrio[])=> void;
+  losPostres: Postre[];
+  setLosPostres:(e: Postre[])=> void;
   HandleActualizarPlatoCalienteEspeficico: (e: string, f:number)=> void;
   HanddleDevolverTodosLosPlatos: (e: string, f:number)=> void;
   escuchaPedidos: boolean;
@@ -86,6 +92,10 @@ const defaultContext: ContextoProps = {
   setlosPedidos: ()=> {},
   lasBebidas: [],
   setLasBebidas: ()=> {},
+  losPlatosFrios: [],
+  setLosPlatosFrios: ()=> {},
+  losPostres: [],
+  setLosPostres: ()=> {},
   HandleActualizarPlatoCalienteEspeficico: ()=> {},
   HanddleDevolverTodosLosPlatos: ()=> {},
   escuchaPedidos: true,
@@ -126,6 +136,8 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
   const [platosCalientes, setPlatosCalientes] = useState<PlatoCaliente[]>([]);
   const [losPedidos, setlosPedidos] = useState<Pedidos[]>([]);
   const [lasBebidas, setLasBebidas] = useState<Bebida[]>([]);
+  const [losPlatosFrios, setLosPlatosFrios] = useState<PlatoFrio[]>([]);
+  const [losPostres, setLosPostres] = useState<Postre[]>([]);
   const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] =
     useState(false);
   const [selectElementBarraLateral, setSelectElementBarraLateral] =
@@ -541,6 +553,10 @@ if (findProductoExistente.length !== 0) {
         setlosPedidos:setlosPedidos,
         lasBebidas: lasBebidas,
         setLasBebidas:setLasBebidas,
+        losPlatosFrios: losPlatosFrios,
+        setLosPlatosFrios:setLosPlatosFrios,
+        losPostres: losPostres,
+        setLosPostres:setLosPostres,
         HandleActualizarPlatoCalienteEspeficico:HandleActualizarPlatoCalienteEspeficico,
         HanddleDevolverTodosLosPlatos:HanddleDevolverTodosLosPlatos,
         escuchaPedidos: escuchaPedidos,
