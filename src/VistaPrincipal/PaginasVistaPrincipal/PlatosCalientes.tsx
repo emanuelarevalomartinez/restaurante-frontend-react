@@ -1,32 +1,17 @@
 
-import { PLato, getPlatosCalientes } from "./UI";
-import { ImagenPlato } from "./UI/ImagenPlato";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { NoHay, Paginacion, Seleccionar } from "../../common";
+import { ImagenPlato } from "./UI/ImagenPlato";
+import { PLato, getPlatosCalientes } from "./UI";
 import { Contexto } from "../../Contexto";
-import { Cargando, Paginacion, Seleccionar } from "../../common";
+import usePaginacion from "../../common/usePaginacion";
 
 export function PlatosCalientes() {
-  const {
-    setPlatosCalientes,
-    platosCalientes,
-    verOcultarRestoDeSeccion,
-    escuchaPlatosCalientes,
-    setEscuchaPlatosCalientes,
-  } = useContext(Contexto);
-
-  useEffect(() => {
-    if (escuchaPlatosCalientes) {
-      const obtenerPlatos = async () => {
-        const platosObtenidos = await getPlatosCalientes();
-        setPlatosCalientes(platosObtenidos);
-        setEscuchaPlatosCalientes(false);
-      };
-      obtenerPlatos();
-    }
-  }, [escuchaPlatosCalientes]);
+  const { verOcultarRestoDeSeccion, setPlatosCalientes, platosCalientes, escuchaPlatosCalientes,setEscuchaPlatosCalientes } = useContext(Contexto);
 
   const [isOpen, setIsOpen] = useState(false);
   const [seleccion, setSeleccion] = useState("A-Z");
+  const { paginaActual, setPaginaActual, cantPaginas, calcularTotalPaginas } = usePaginacion('platosCalientes');
   const [elementos] = useState(["A-Z", "Z-A"]);
   const referencia = useRef<HTMLDivElement>(null);
 
@@ -38,36 +23,42 @@ export function PlatosCalientes() {
   };
 
   const handleHacerClickFuera = (event: MouseEvent) => {
-    if (
-      referencia.current &&
-      !referencia.current.contains(event.target as Node)
-    ) {
+    if (referencia.current && !referencia.current.contains(event.target as Node)) {
       setIsOpen(false);
     }
   };
 
   const ocultarLista = useCallback(() => {
     setIsOpen(false);
-}, []);
+  }, []);
+
+  const obtenerPlatosCalientes = async () => {
+    const { platos, totalDeProductos } = await getPlatosCalientes(seleccion === "A-Z");
+    calcularTotalPaginas(totalDeProductos);
+    setPlatosCalientes(platos);
+    setEscuchaPlatosCalientes(false);
+  };
 
   useEffect(() => {
+    obtenerPlatosCalientes();
+
     document.addEventListener("mousedown", handleHacerClickFuera);
 
     return () => {
       document.removeEventListener("mousedown", handleHacerClickFuera);
     };
-  }, []);
+  }, [seleccion,escuchaPlatosCalientes]);
 
-  if (escuchaPlatosCalientes) {
-    return <Cargando />;
-  }
+  useEffect(() => {
+    if (!platosCalientes.length) {
+      obtenerPlatosCalientes();
+    }
+  }, [platosCalientes.length]);
+
+  
 
   if (!platosCalientes.length) {
-    return (
-      <div className="flex flex-col items-center">
-        <p className="text-red-500">Actualmente no hay platos</p>
-      </div>
-    );
+    return <NoHay elemento="Platos Calientes" />;
   }
 
   return (
@@ -88,24 +79,21 @@ export function PlatosCalientes() {
         />
       </div>
       <div className="grid p-8 grid-cols-1 md:grid-cols-2 gap-16 lg:grid-cols-3">
-        {platosCalientes.map((plato, index) => {
-          return (
-            <PLato
-              key={index}
-              identificador={plato.id}
-              nombreProducto={plato.descripcionPlato}
-              precio={plato.precio}
-              direccionImagen={plato.imagenAsociada}
-              cantRestante={plato.cantRestante}
-            >
-              <ImagenPlato src={plato.imagenAsociada} />
-            </PLato>
-          );
-        })}
+        {platosCalientes.slice((paginaActual - 1) * 6, paginaActual * 6).map((platoCaliente, index) => (
+          <PLato
+            key={index}
+            identificador={platoCaliente.id}
+            nombreProducto={platoCaliente.descripcionPlato}
+            precio={platoCaliente.precio}
+            direccionImagen={platoCaliente.imagenAsociada}
+            cantRestante={platoCaliente.cantRestante}
+          >
+            <ImagenPlato src={platoCaliente.imagenAsociada} />
+          </PLato>
+        ))}
       </div>
-      <div>
-        <Paginacion/>
-      </div>
+      <Paginacion cantPaginas={cantPaginas} paginaActual={paginaActual} setPaginaActual={setPaginaActual}/>
     </div>
   );
 }
+

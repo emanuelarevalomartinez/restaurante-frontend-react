@@ -33,6 +33,7 @@ const navigate = useNavigate();
                             handleVerOcultarContenido(false);
                             navigate("/");
                             localStorage.setItem("posicionBarraNavegacion", JSON.stringify(0));
+                            localStorage.setItem("ver", JSON.stringify(false));
                             handleChangeSelecionBarraLateral("/");
                         }}>
                             <RiHome6Line className="text-2xl"/>
@@ -45,7 +46,10 @@ const navigate = useNavigate();
                         onClick={()=> {
                             handleVerOcultarContenido(true);
                             navigate("/RechasoEditarProductos");
-                            handleChangeSelecionBarraLateral("editar");
+                            // handleChangeSelecionBarraLateral("editar");
+                            const a = "editar"
+                            localStorage.setItem("barra", JSON.stringify(a));
+                            localStorage.setItem("ver", JSON.stringify(true));
                             // editar
                         }}>
                             <RiEditLine className="text-2xl"/>
@@ -59,6 +63,7 @@ const navigate = useNavigate();
                             handleVerOcultarContenido(true);
                             navigate("/Ordenes");
                             handleChangeSelecionBarraLateral("carrito");
+                            localStorage.setItem("ver", JSON.stringify(true));
                             // carrito
                         }}>
                             <RiPieChartLine className="text-2xl"/>
@@ -72,6 +77,7 @@ const navigate = useNavigate();
                             handleVerOcultarContenido(true);
                             navigate('/AcercaDe');
                             handleChangeSelecionBarraLateral("acercaDe");
+                            localStorage.setItem("ver", JSON.stringify(true));
                             // acerca de
                         }}
                         >
@@ -87,6 +93,7 @@ const navigate = useNavigate();
                             handleVerOcultarContenido(true);
                             navigate("Notificaciones");
                             handleChangeSelecionBarraLateral("notificaciones");
+                            localStorage.setItem("ver", JSON.stringify(true));
                             //notificaciones
                           } }>
                             <RiNotificationLine className="text-2xl"/>
@@ -100,6 +107,7 @@ const navigate = useNavigate();
                             handleVerOcultarContenido(true);
                             navigate("/Configuracion");
                             handleChangeSelecionBarraLateral("configuracion");
+                            localStorage.setItem("ver", JSON.stringify(true));
                             // ajustes
                         }}>
                             <RiSettings4Line className="text-2xl"/>

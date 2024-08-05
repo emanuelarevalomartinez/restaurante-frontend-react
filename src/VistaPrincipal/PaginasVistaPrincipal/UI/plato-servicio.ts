@@ -1,15 +1,22 @@
 import { PlatoCaliente, PlatoCalienteActualizar } from "../../../Interfaces";
-
-export async function getPlatosCalientes(): Promise<PlatoCaliente[]> {
-    try {
-        const response = await fetch('http://localhost:3000/api/platos-calientes');
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.log(error);
-        return [];
+export async function getPlatosCalientes(ordenAsc?: boolean): Promise<{ platos: PlatoCaliente[], totalDeProductos: number }> {
+  try {
+    let url = 'http://localhost:3000/api/platos-calientes/';
+    if (typeof ordenAsc !== 'undefined') {
+      url += `${ordenAsc}`;
     }
-}; 
+
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log(error);
+    return { platos: [], totalDeProductos: 0 };
+  }
+}
+
+
+
 export async function getUnPlato( idPlato: string ): Promise<PlatoCaliente | null> {
     try {
         const response = await fetch(`http://localhost:3000/api/platos-calientes/obtenerUno/${idPlato}`);

@@ -26,9 +26,6 @@ export function Autentificacion() {
       email: email,
       password: password,
     };
-
-    console.log(datos);
-   
     const respuesta = await getRegistrarUsuario(datos);
     console.log(respuesta);
     
@@ -37,16 +34,6 @@ export function Autentificacion() {
     } else {
       console.error('Datos incorrectos o error en la respuesta');
     }
-
-    // if (respuesta) {
-    //   console.log(respuesta);
-    //   setResponse(respuesta);
-    //   // login(respuesta);
-      
-    // } else {
-    //   console.error('Datos incorrectos o error en la respuesta');
-    // } 
-  
   }
 
   return (

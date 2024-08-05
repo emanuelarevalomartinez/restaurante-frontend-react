@@ -19,8 +19,6 @@ export function Notificacion(){
                 <div className="row-start-1 row-span-3 sm:row-auto sm:row-start-auto col-start-4 sm:col-start-auto col-span-1 sm:col-span-1 text-center flex cursor-pointer ">
                 <div className="w-2/3 h-2/3 sm:w-full sm:h-full m-auto flex justify-center items-center rounded-md  bg-[#1F1D2B] text-red-800"
             onClick={()=> {
-                console.log("hola");
-                
             }}
             
             >

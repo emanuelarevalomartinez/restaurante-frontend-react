@@ -13,14 +13,23 @@ import { crearPedido, deletePedidoMedianteUsuario, getUnPedidoPorUsuario, update
 import { Auth } from "./Autentificacion/Auth";
 import { Bebida } from "./Interfaces/Bebida";
 import { getPlatosCalientes, updatePlatoCaliente } from "./VistaPrincipal/PaginasVistaPrincipal/UI";
-import { getBebidas, updateBebida } from "./VistaPrincipal/PaginasVistaPrincipal";
+import { getBebidas, getPlatosFrios, getPostres, updateBebida, updatePlatoFrio, updatePostre } from "./VistaPrincipal/PaginasVistaPrincipal";
 
-// estoy trabajando en el backend en ver como establecer las relaciones del  usuario
 // si es usuario o administrador
 // documentar la api
 // añadir limite de los datos que se devuelvan por pagina
 // añadir paginacion en el frontend
 // crear modal del frontend y las notificaciones emergentes
+
+//! estoy fajao con la paginacion 
+
+//* hay que hacer
+//* terminar de arreglar la posicion de los elementos en la barra lateral
+//* hacer que cuando se recargue la pagina la varible que hace que se oculte la seccion secundaria se mantenga correctamente usando locastorage y lo mismo para la posicion de los elementos en la barra lateral , tratar de mover todo esto al localstorage del usuario
+
+//? hacer que las peticiones sean por limite de paginacion a 6 elementos a la vez
+//? implementar la funcionalidad de eliminar todos los pedidos en la seccion secundaria
+//? pasar todos los elementos del localstorage para una seccion dentro del localstorage del usuario
 
 interface ContextoProps {
   barraVistaMovil: boolean;
@@ -46,6 +55,10 @@ interface ContextoProps {
   setEscuchaPlatosCalientes: (e: boolean) => void;
   escuchaBebidas: boolean;
   setEscuchaBebidas: (e: boolean) => void;
+  escuchaPlatosFrios: boolean;
+  setEscuchaPlatosFrios: (e: boolean) => void;
+  escuchaPostres: boolean;
+  setEscuchaPostres: (e: boolean) => void;
   escuchaPlatoCaliente: boolean;
   setEscuchaPlatoCaliente: (e: boolean) => void;
   HandleAddPedido: (
@@ -104,6 +117,10 @@ const defaultContext: ContextoProps = {
   setEscuchaPlatosCalientes: () => {},
   escuchaBebidas: true,
   setEscuchaBebidas: () => {},
+  escuchaPlatosFrios: true,
+  setEscuchaPlatosFrios: () => {},
+  escuchaPostres: true,
+  setEscuchaPostres: () => {},
   escuchaPlatoCaliente: true,
   setEscuchaPlatoCaliente: ()=> {},
   HandleAddPedido: () => {},
@@ -135,20 +152,40 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     useState<boolean>(false);
   const [platosCalientes, setPlatosCalientes] = useState<PlatoCaliente[]>([]);
   const [losPedidos, setlosPedidos] = useState<Pedidos[]>([]);
-  const [lasBebidas, setLasBebidas] = useState<Bebida[]>([]);
   const [losPlatosFrios, setLosPlatosFrios] = useState<PlatoFrio[]>([]);
+  const [lasBebidas, setLasBebidas] = useState<Bebida[]>([]);
   const [losPostres, setLosPostres] = useState<Postre[]>([]);
-  const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] =
-    useState(false);
-  const [selectElementBarraLateral, setSelectElementBarraLateral] =
-    useState(seleccionSeccion);
   const [escuchaPedidos, setEscuchaPedidos] = useState(true);
   const [escuchaPlatosCalientes, setEscuchaPlatosCalientes] = useState(true);
   const [escuchaBebidas, setEscuchaBebidas] = useState(true);
+  const [escuchaPlatosFrios, setEscuchaPlatosFrios] = useState(true);
+  const [escuchaPostres, setEscuchaPostres] = useState(true);
   const [escuchaPlatoCaliente, setEscuchaPlatoCaliente] = useState(true);
-
-
   const [usuario, setUsuario] = useState<Usuario | null>(null);
+  // const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] =
+  //   useState(false);
+  const [selectElementBarraLateral, setSelectElementBarraLateral] =
+    useState(seleccionSeccion);
+  // const [selectElementBarraLateral, setSelectElementBarraLateral] =
+  // useState(()=>{
+  //   const barra = localStorage.getItem("barra");
+  //   if(barra){
+  //       const position = JSON.parse(barra);
+  //       return position;
+  //   } else {
+  //     return ;
+  //   }
+  // });
+  const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] =
+    useState(()=>{
+      const ver = localStorage.getItem("ver");
+      if(ver){
+        const status = JSON.parse(ver);
+        return status;
+      } else {
+        return false;
+      }
+    });
   const [acceso, setAcceso] = useState(() => {
     const exist = localStorage.getItem('usuario');
     return exist ? true : false;
@@ -176,11 +213,16 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
       console.warn("No se recibió el token del backend");
       setAcceso(false);
       localStorage.removeItem('posicionBarraNavegacion');
+      localStorage.removeItem('ver');
+      localStorage.removeItem('barra');
       localStorage.removeItem("usuario");
     }
   }
 
   function logout(){
+    localStorage.removeItem('posicionBarraNavegacion');
+      localStorage.removeItem('ver');
+      localStorage.removeItem('barra');
     localStorage.removeItem('usuario');
                   setAcceso(false);
                   setUsuario(null);
@@ -252,8 +294,14 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
         (plato) => plato.id == añadirPedido.idProducto
       );
 
+      const buscarPlatoFrio = losPlatosFrios.filter(
+        (platoFrio) => platoFrio.idPlatoFrio == añadirPedido.idProducto
+      );
       const buscarBebida = lasBebidas.filter(
         (bebida) => bebida.idBebida == añadirPedido.idProducto
+      );
+      const buscarPostre = losPostres.filter(
+        (postre) => postre.idPostre == añadirPedido.idProducto
       );
 
       let montoBase: number = 1;
@@ -264,10 +312,20 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
             cantRes = buscarPlatoCaliente[0].cantRestante;
             añadirPedido.tipoProducto="Plato Caliente";
     }
+     if (buscarPlatoFrio.length !== 0) {
+            montoBase = buscarPlatoFrio[0].precio;
+            cantRes = buscarPlatoFrio[0].cantRestante;
+            añadirPedido.tipoProducto="Plato Frio";
+    }
      if (buscarBebida.length !== 0) {
             montoBase = buscarBebida[0].precio;
             cantRes = buscarBebida[0].cantRestante;
             añadirPedido.tipoProducto="Bebida";
+    }
+     if (buscarPostre.length !== 0) {
+            montoBase = buscarPostre[0].precio;
+            cantRes = buscarPostre[0].cantRestante;
+            añadirPedido.tipoProducto="Postre";
     }
 
     const auth = Auth();
@@ -277,6 +335,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
         
   
         let actualizar: PedidoActualizar = {
+          
           descripcion: elementoAActualizar.descripcion,
           montoTotal: elementoAActualizar.montoTotal + montoBase,
           cantidadAOrdenar: elementoAActualizar.cantidadAOrdenar + 1,
@@ -293,8 +352,19 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
               .then( async ()=> {
                 await getPlatosCalientes()
                 .then( (data)=> {
-                  setPlatosCalientes(data);
+                  setPlatosCalientes(data.platos);
                   setEscuchaPlatosCalientes(true);
+                } )
+              } )
+            } else if(buscarPlatoFrio.length !== 0){
+              await updatePlatoFrio(elementoAActualizar.idProducto,{
+                cantRestante: cantRestante - 1,
+              })
+              .then( async ()=> {
+                await getPlatosFrios()
+                .then( (data)=> {
+                  setLosPlatosFrios(data.platosFrios);
+                  setEscuchaPlatosFrios(true);
                 } )
               } )
             } else if(buscarBebida.length !== 0){
@@ -304,8 +374,19 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
               .then( async ()=> {
                 await getBebidas()
                 .then( (data)=> {
-                  setLasBebidas(data);
-                  setEscuchaPlatosCalientes(true);
+                  setLasBebidas(data.bebidas);
+                  setEscuchaBebidas(true);
+                } )
+              } )
+            } else if(buscarPostre.length !== 0){
+               await updatePostre(elementoAActualizar.idProducto,{
+                cantRestante: cantRestante - 1,
+              })
+              .then( async ()=> {
+                await getPostres()
+                .then( (data)=> {
+                  setLosPostres(data.postres);
+                  setEscuchaPostres(true);
                 } )
               } )
             }
@@ -334,19 +415,41 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
               .then( async ()=> {
                 await getPlatosCalientes()
                 .then( (data)=> {
-                  setPlatosCalientes(data);
+                  setPlatosCalientes(data.platos);
                   setEscuchaPlatosCalientes(true);
                 } )
               } )
-            } else {
+            } else if( buscarPlatoFrio.length !==0 ) {
+               await updatePlatoFrio(id,{
+                cantRestante: cantRestante - 1,
+              })
+              .then( async ()=> {
+                await getPlatosFrios()
+                .then( (data)=> {
+                  setLosPlatosFrios(data.platosFrios);
+                  setEscuchaPlatosFrios(true);
+                } )
+              } )
+            } else if( buscarBebida.length !==0 ) {
                 await updateBebida(id,{
                   cantRestante: cantRestante - 1,
                 })
                 .then( async ()=> {
                   await getBebidas()
                   .then( (data)=> {
-                    setLasBebidas(data);
-                    setEscuchaPlatosCalientes(true);
+                    setLasBebidas(data.bebidas);
+                    setEscuchaBebidas(true);
+                  } )
+                } )
+            } else if( buscarPostre.length !==0 ) {
+                await updatePostre(id,{
+                  cantRestante: cantRestante - 1,
+                })
+                .then( async ()=> {
+                  await getPostres()
+                  .then( (data)=> {
+                    setLosPostres(data.postres);
+                    setEscuchaPostres(true);
                   } )
                 } )
             }
@@ -384,8 +487,14 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
       (plato) => plato.id == quitarPedido.idProducto
     );
 
+    const buscarPlatoFrio = losPlatosFrios.filter(
+      (platoFrio) => platoFrio.idPlatoFrio == quitarPedido.idProducto
+    );
     const buscarBebida = lasBebidas.filter(
       (bebida) => bebida.idBebida == quitarPedido.idProducto
+    );
+    const buscarPostre = losPostres.filter(
+      (postre) => postre.idPostre == quitarPedido.idProducto
     );
 
     let montoBase: number = 1;
@@ -397,10 +506,20 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
       cantRes = buscarPlatoCaliente[0].cantRestante;
       quitarPedido.tipoProducto="Plato Caliente";
 }
+if (buscarPlatoFrio.length !== 0) {
+      montoBase = buscarPlatoFrio[0].precio;
+      cantRes = buscarPlatoFrio[0].cantRestante;
+      quitarPedido.tipoProducto="Plato Frio";
+}
 if (buscarBebida.length !== 0) {
       montoBase = buscarBebida[0].precio;
       cantRes = buscarBebida[0].cantRestante;
       quitarPedido.tipoProducto="Bebida";
+}
+if (buscarPostre.length !== 0) {
+      montoBase = buscarPostre[0].precio;
+      cantRes = buscarPostre[0].cantRestante;
+      quitarPedido.tipoProducto="Postre";
 }
 
 const auth = Auth();
@@ -426,39 +545,56 @@ if (findProductoExistente.length !== 0) {
           
             deletePedidoMedianteUsuario(auth.idUsuario,id)
             .then( async ()=> {
-              //* 
               if(buscarPlatoCaliente.length !== 0){
-                console.log("perro");
-                
                 await updatePlatoCaliente(id,{
                   cantRestante: cantRestante + 1,
                 })
                 .then( async ()=> {
                   await getPlatosCalientes()
                   .then( (data)=> {
-                    setPlatosCalientes(data);
+                    setPlatosCalientes(data.platos);
                     setEscuchaPedidos(true);
                     setEscuchaPlatosCalientes(true);
                   } )
                 } )
+              } else if(buscarPlatoFrio.length !== 0){
+                 await updatePlatoFrio(id,{
+                  cantRestante: cantRestante + 1,
+                })
+                .then( async ()=> {
+                  await getPlatosFrios()
+                  .then( (data)=> {
+                    setLosPlatosFrios(data.platosFrios);
+                    setEscuchaPedidos(true);
+                    setEscuchaPlatosFrios(true);
+                  } )
+                } )
               } else if(buscarBebida.length !== 0){
-                 console.log("hoolaaaaaa");
-                 //*
-                 await updateBebida(id,{
+                await updateBebida(id,{
                   cantRestante: cantRestante + 1,
                 })
                 .then( async ()=> {
                   await getBebidas()
                   .then( (data)=> {
-                    setLasBebidas(data);
+                    setLasBebidas(data.bebidas);
                     setEscuchaPedidos(true);
-                    setEscuchaPlatosCalientes(true);
+                    setEscuchaBebidas(true);
                   } )
                 } )
-                 //*
+              } else if(buscarPostre.length !== 0){
+                await updatePostre(id,{
+                  cantRestante: cantRestante + 1,
+                })
+                .then( async ()=> {
+                  await getPostres()
+                  .then( (data)=> {
+                    setLosPostres(data.postres);
+                    setEscuchaPedidos(true);
+                    setEscuchaPostres(true);
+                  } )
+                } )
               }
             } )
-          //*
 
          } else {
           
@@ -471,25 +607,43 @@ if (findProductoExistente.length !== 0) {
         .then( async ()=> {
           await getPlatosCalientes()
           .then( (data)=> {
-            setPlatosCalientes(data);
+            setPlatosCalientes(data.platos);
             setEscuchaPlatosCalientes(true);
           } )
         } )
+      } else if(buscarPlatoFrio.length !== 0){
+        await updatePlatoFrio(elementoAActualizar.idProducto,{
+          cantRestante: cantRestante + 1,
+        })
+        .then( async ()=> {
+          await getPlatosFrios()
+          .then( (data)=> {
+            setLosPlatosFrios(data.platosFrios);
+            setEscuchaPlatosFrios(true);
+          } )
+        } )
       } else if(buscarBebida.length !== 0){
-        console.log("nuevo");
-        //*
         await updateBebida(elementoAActualizar.idProducto,{
           cantRestante: cantRestante + 1,
         })
         .then( async ()=> {
           await getBebidas()
           .then( (data)=> {
-            setLasBebidas(data);
-            setEscuchaPlatosCalientes(true);
+            setLasBebidas(data.bebidas);
+            setEscuchaBebidas(true);
           } )
         } )
-        //*
-
+      } else if(buscarPostre.length !== 0){
+        await updatePostre(elementoAActualizar.idProducto,{
+          cantRestante: cantRestante + 1,
+        })
+        .then( async ()=> {
+          await getPostres()
+          .then( (data)=> {
+            setLosPostres(data.postres);
+            setEscuchaPostres(true);
+          } )
+        } )
       }
     })
     .catch((error) => {
@@ -565,6 +719,10 @@ if (findProductoExistente.length !== 0) {
         setEscuchaPlatosCalientes: setEscuchaPlatosCalientes,
         escuchaBebidas: escuchaBebidas,
         setEscuchaBebidas: setEscuchaBebidas,
+        escuchaPlatosFrios: escuchaPlatosFrios,
+        setEscuchaPlatosFrios: setEscuchaPlatosFrios,
+        escuchaPostres: escuchaPostres,
+        setEscuchaPostres: setEscuchaPostres,
         escuchaPlatoCaliente: escuchaPlatoCaliente,
         setEscuchaPlatoCaliente: setEscuchaPlatoCaliente,
         HandleAddPedido: HandleAddPedido,

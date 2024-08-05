@@ -1,30 +1,26 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Paginacion, Seleccionar } from "../../common";
+import { NoHay, Paginacion, Seleccionar } from "../../common";
 import { PLato } from "./UI";
 import { ImagenPlato } from "./UI/ImagenPlato";
 import { Contexto } from "../../Contexto";
 import { getPostres } from ".";
+import usePaginacion from "../../common/usePaginacion";
 
-
-export function Postres(){
-
-  const { verOcultarRestoDeSeccion, losPostres, setLosPostres } = useContext(Contexto);
+export function Postres() {
+  const {
+    verOcultarRestoDeSeccion,
+    losPostres,
+    setLosPostres,
+    escuchaPostres,
+    setEscuchaPostres,
+  } = useContext(Contexto);
 
   const [isOpen, setIsOpen] = useState(false);
   const [seleccion, setSeleccion] = useState("A-Z");
+  const { paginaActual, setPaginaActual, cantPaginas, calcularTotalPaginas } =
+    usePaginacion("postres");
   const [elementos] = useState(["A-Z", "Z-A"]);
   const referencia = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // if (escuchaPlatosCalientes) {
-      const obtenerPostres = async () => {
-        const postresObtenidos = await getPostres();
-        setLosPostres(postresObtenidos);
-        
-      };
-      obtenerPostres();
-    // }
-  }, []);
 
   const hacerClick = () => setIsOpen(!isOpen);
 
@@ -44,18 +40,37 @@ export function Postres(){
 
   const ocultarLista = useCallback(() => {
     setIsOpen(false);
-}, []);
+  }, []);
+
+  const obtenerPostres = async () => {
+    const { postres, totalDeProductos } = await getPostres(seleccion === "A-Z");
+    calcularTotalPaginas(totalDeProductos);
+    setLosPostres(postres);
+    setEscuchaPostres(false);
+  };
 
   useEffect(() => {
+    obtenerPostres();
+
     document.addEventListener("mousedown", handleHacerClickFuera);
 
     return () => {
       document.removeEventListener("mousedown", handleHacerClickFuera);
     };
-  }, []);
+  }, [seleccion, escuchaPostres]);
 
-    return (
-      <div className={`${verOcultarRestoDeSeccion ? "hidden" : "px-4"}`}>
+  useEffect(() => {
+    if (!losPostres.length) {
+      obtenerPostres();
+    }
+  }, [losPostres.length]);
+
+  if (!losPostres.length) {
+    return <NoHay elemento="Postres" />;
+  }
+
+  return (
+    <div className={`${verOcultarRestoDeSeccion ? "hidden" : "px-4"}`}>
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl text-gray-300">Postres</h2>
 
@@ -72,24 +87,26 @@ export function Postres(){
         />
       </div>
       <div className="grid p-8 grid-cols-1 md:grid-cols-2 gap-16 lg:grid-cols-3">
-        {losPostres.map((postre, index) => {
-          return (
+        {losPostres
+          .slice((paginaActual - 1) * 6, paginaActual * 6)
+          .map((postres, index) => (
             <PLato
               key={index}
-              identificador={postre.id}
-              nombreProducto={postre.descripcionPostre}
-              precio={postre.precio}
-              direccionImagen={postre.imagenAsociada}
-              cantRestante={postre.cantRestante}
+              identificador={postres.idPostre}
+              nombreProducto={postres.descripcionPostre}
+              precio={postres.precio}
+              direccionImagen={postres.imagenAsociada}
+              cantRestante={postres.cantRestante}
             >
-              <ImagenPlato src={postre.imagenAsociada} />
+              <ImagenPlato src={postres.imagenAsociada} />
             </PLato>
-          );
-        })}
+          ))}
       </div>
-      <div>
-        <Paginacion/>
-      </div>
+      <Paginacion
+        cantPaginas={cantPaginas}
+        paginaActual={paginaActual}
+        setPaginaActual={setPaginaActual}
+      />
     </div>
-    )
+  );
 }

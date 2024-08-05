@@ -43,7 +43,6 @@ export function Seleccionar({referencia,seleccion,hacerClick,isOpen,listaElement
       </div>
 
       {isOpen && (
-        // <div className={`origin-top-right absolute right-2 mt-1 ${ancho} rounded-lg shadow-lg bg-[#1F1D2B] ring-1 ring-black ring-opacity-5`}>
         <div className={`origin-top-right absolute mt-1 ${ancho} rounded-lg shadow-lg bg-[#1F1D2B] ring-1 ring-black ring-opacity-5 z-10 ${posicionListaDesplegable? `${posicionListaDesplegable}` : `right-2`}`}>
           <div>
             { 

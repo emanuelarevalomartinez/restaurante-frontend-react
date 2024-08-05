@@ -3,78 +3,78 @@ import { Contexto } from "../../Contexto";
 import { ImagenPlato } from "./UI/ImagenPlato";
 import { PLato } from "./UI";
 import { getBebidas } from ".";
-import { Cargando, Paginacion, Seleccionar } from "../../common";
+import { NoHay, Paginacion, Seleccionar } from "../../common";
+import usePaginacion from "../../common/usePaginacion";
 
-export function Bebidas(){
+export function Bebidas() {
+  const {
+    verOcultarRestoDeSeccion,
+    lasBebidas,
+    setLasBebidas,
+    escuchaBebidas,
+    setEscuchaBebidas,
+  } = useContext(Contexto);
 
+  const [isOpen, setIsOpen] = useState(false);
+  const [seleccion, setSeleccion] = useState("A-Z");
+  const { paginaActual, setPaginaActual, cantPaginas, calcularTotalPaginas } =
+    usePaginacion("bebidas");
+  const [elementos] = useState(["A-Z", "Z-A"]);
+  const referencia = useRef<HTMLDivElement>(null);
 
-    const { verOcultarRestoDeSeccion,lasBebidas, setLasBebidas,escuchaBebidas,setEscuchaBebidas } = useContext(Contexto);
+  const hacerClick = () => setIsOpen(!isOpen);
 
-    useEffect(() => {
-      if(escuchaBebidas){
+  const handleCambiarSeleccionado = (option: string) => {
+    setSeleccion(option);
+    setIsOpen(false);
+  };
 
-        const obtenerBebidas = async () => {
-          await getBebidas()
-          .then( (data)=> {
+  const handleHacerClickFuera = (event: MouseEvent) => {
+    if (
+      referencia.current &&
+      !referencia.current.contains(event.target as Node)
+    ) {
+      setIsOpen(false);
+    }
+  };
 
-            setLasBebidas(data);
-            setEscuchaBebidas(false);
-          } 
-          )
-          
-        };
-        obtenerBebidas();
-      }
-      }, [escuchaBebidas]);
+  const ocultarLista = useCallback(() => {
+    setIsOpen(false);
+  }, []);
 
-      const [isOpen, setIsOpen] = useState(false);
-      const [seleccion, setSeleccion] = useState("A-Z");
-      const [elementos] = useState(["A-Z", "Z-A"]);
-      const referencia = useRef<HTMLDivElement>(null);
-    
-      const hacerClick = () => setIsOpen(!isOpen);
-    
-      const handleCambiarSeleccionado = (option: string) => {
-        setSeleccion(option);
-        setIsOpen(false);
-      };
+  const obtenerBebidas = async () => {
+    const { bebidas, totalDeProductos } = await getBebidas(seleccion === "A-Z");
+    calcularTotalPaginas(totalDeProductos);
+    setLasBebidas(bebidas);
+    setEscuchaBebidas(false);
+  };
 
-      const ocultarLista = useCallback(() => {
-        setIsOpen(false);
-    }, []);
-    
-      const handleHacerClickFuera = (event: MouseEvent) => {
-        if (
-          referencia.current &&
-          !referencia.current.contains(event.target as Node)
-        ) {
-          setIsOpen(false);
-        }
-      };
-    
-      useEffect(() => {
-        document.addEventListener("mousedown", handleHacerClickFuera);
-    
-        return () => {
-          document.removeEventListener("mousedown", handleHacerClickFuera);
-        };
-      }, []);
+  useEffect(() => {
+    obtenerBebidas();
 
+    document.addEventListener("mousedown", handleHacerClickFuera);
 
-      if(escuchaBebidas){
-         return(
-          <div>
-            <Cargando/>
-          </div>
-         )
-      }
+    return () => {
+      document.removeEventListener("mousedown", handleHacerClickFuera);
+    };
+  }, [seleccion, escuchaBebidas]);
 
+  useEffect(() => {
+    if (!lasBebidas.length) {
+      obtenerBebidas();
+    }
+  }, [lasBebidas.length]);
 
-    return (
-        <div className={`${verOcultarRestoDeSeccion? "hidden" : "px-4"}`}>
-        <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xl text-gray-300">Bebidas</h2>
-            <Seleccionar
+  if (!lasBebidas.length) {
+    return <NoHay elemento="Bebidas" />;
+  }
+
+  return (
+    <div className={`${verOcultarRestoDeSeccion ? "hidden" : "px-4"}`}>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-xl text-gray-300">Bebidas</h2>
+
+        <Seleccionar
           listaElementos={elementos}
           seleccion={seleccion}
           isOpen={isOpen}
@@ -85,31 +85,28 @@ export function Bebidas(){
           ocultarLista={ocultarLista}
           ancho={`w-20`}
         />
-
-        </div>
-    <div className="grid p-8 grid-cols-1 md:grid-cols-2 gap-16 lg:grid-cols-3">
-
-
-
-       { 
-          lasBebidas.map( (bebida,index)=> {
-           return (
-                <PLato key={index}
-                  identificador={bebida.idBebida}
-                  nombreProducto={bebida.descripcionBebida}
-                  precio={bebida.precio}
-                  cantRestante={bebida.cantRestante}
-                  direccionImagen={bebida.imagenAsociada}
-                >
-                     <ImagenPlato src={bebida.imagenAsociada}/>
-                </PLato>
-           )
-          } )
-       }
+      </div>
+      <div className="grid p-8 grid-cols-1 md:grid-cols-2 gap-16 lg:grid-cols-3">
+        {lasBebidas
+          .slice((paginaActual - 1) * 6, paginaActual * 6)
+          .map((bebidas, index) => (
+            <PLato
+              key={index}
+              identificador={bebidas.idBebida}
+              nombreProducto={bebidas.descripcionBebida}
+              precio={bebidas.precio}
+              direccionImagen={bebidas.imagenAsociada}
+              cantRestante={bebidas.cantRestante}
+            >
+              <ImagenPlato src={bebidas.imagenAsociada} />
+            </PLato>
+          ))}
+      </div>
+      <Paginacion
+        cantPaginas={cantPaginas}
+        paginaActual={paginaActual}
+        setPaginaActual={setPaginaActual}
+      />
     </div>
-    <div>
-      <Paginacion/>
-    </div>
-    </div>
-    )
+  );
 }

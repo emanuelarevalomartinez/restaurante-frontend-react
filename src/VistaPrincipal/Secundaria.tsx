@@ -8,7 +8,6 @@ import { useContext, useEffect } from "react";
 import { Contexto } from "../Contexto";
 import { getLosPedidos } from "./PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios/los-pedidos.servicios";
 import { Auth } from "../Autentificacion/Auth";
-import { Cargando } from "../common";
 
 interface Props {
   visivility: boolean;
@@ -72,16 +71,9 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
             </div>
 
             <div className="h-[50vh] lg:h-[60vh] overflow-y-scroll scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-100">
-              {!losPedidos.length ? (
+              {losPedidos.length === 0 ? (
                 <div className="rounded-sm text-center py-10 sm:py-32 lg:py-48 text-red-500 border-t-2 mt-4 border-b-2 border-red-500 m-auto">
                   <span>Aún no tiene pedidos</span>
-                </div>
-              ) : 
-              escuchaPedidos ? (
-                <div className="rounded-sm text-center py-10 sm:py-32 lg:py-48 text-green-500 border-t-2 mt-4 border-b-2 border-green-500 m-auto">
-                  <span>
-                    <Cargando/>
-                    </span>
                 </div>
               ) : 
               (
