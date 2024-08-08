@@ -4,10 +4,11 @@ import {
   Enviar,
   Pedido,
 } from "./PaginasVistaPrincipal/PaginaSecundaria/UI-Secundaria";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Contexto } from "../Contexto";
-import { getLosPedidos } from "./PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios/los-pedidos.servicios";
+import { deleteAllPedidos, getLosPedidos } from "./PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios/los-pedidos.servicios";
 import { Auth } from "../Autentificacion/Auth";
+import { Modal } from "../common";
 
 interface Props {
   visivility: boolean;
@@ -21,6 +22,10 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
     escuchaPedidos,
     setEscuchaPedidos,
     setlosPedidos,
+    setEscuchaBebidas,
+    setEscuchaPlatosCalientes,
+    setEscuchaPlatosFrios,
+    setEscuchaPostres,
   } = useContext(Contexto);
 
   useEffect(() => {
@@ -34,10 +39,52 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
     };
     obtenerLosPedidos();
   }, [escuchaPedidos]);
-  
+
+  const [open, setOpen] = useState(false);
+
+  function cancelar() {
+    setOpen(false);
+  }
+
+  function aceptar() {
+    const auth = Auth();
+
+    if(auth){
+       const borrarTodosLosPedidos = async ()=> {
+          await deleteAllPedidos(auth.idUsuario)
+          .then( ()=> {
+            setEscuchaPedidos(true);
+            setEscuchaBebidas(true);
+            setEscuchaPlatosCalientes(true);
+            setEscuchaPlatosFrios(true);
+            setEscuchaPostres(true);
+            setOpen(false);
+          } )
+       }
+       borrarTodosLosPedidos();
+    }
+  }
 
   return (
     <>
+      <Modal isOpen={open} cancelar={cancelar} aceptar={aceptar}>
+      <div className="w-full h-full justify-center items-center flex">
+      {losPedidos.length == 0 ? (
+            <div>
+                <p className="text-center text-3xl">
+                  Aún no tiene ningún producto en el carrito.
+                </p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-center text-3xl">
+              ¿Estas seguro de que quieres eliminar todos tus pedidos del carrito?
+              </p>
+            </div>
+          )}
+          </div>
+      </Modal>
+
       <div
         className={`${verOcultarRestoDeSeccion ? "hidden -right-full" : ""}`}
       >
@@ -60,7 +107,12 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
             <h1 className="text-2xl">Pedidos</h1>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 p-2">
+          <div
+            className="flex flex-wrap items-center gap-2 p-2"
+            onClick={() => {
+              setOpen(true);
+            }}
+          >
             <AccionEnCarrito nombre={"Eliminar todos los pedidos"} />
           </div>
 
@@ -72,11 +124,10 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
 
             <div className="h-[50vh] lg:h-[60vh] overflow-y-scroll scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-100">
               {losPedidos.length === 0 ? (
-                <div className="rounded-sm text-center py-10 sm:py-32 lg:py-48 text-red-500 border-t-2 mt-4 border-b-2 border-red-500 m-auto">
+                <div className="rounded-sm text-center py-10 sm:py-40 lg:py-52 text-red-500 border-t-2 mt-1 border-b-2 border-red-500 m-auto">
                   <span>Aún no tiene pedidos</span>
                 </div>
-              ) : 
-              (
+              ) : (
                 losPedidos.map((pedido, index) => (
                   <Pedido
                     key={index}
@@ -92,7 +143,7 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
               )}
             </div>
           </div>
-          <Enviar descuento={30} subtotal={2000} />
+          <Enviar/>
         </div>
       </div>
     </>

@@ -51,7 +51,7 @@ useEffect(() => {
 
 
     return (
-        <nav className={`${verOcultarRestoDeSeccion? "hidden" : "flex overflow-x-auto sm:overflow-x-hidden text-gray-300 justify-start sm:justify-around mb-6 scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-10"}`}>
+        <nav className={`${verOcultarRestoDeSeccion? "hidden" : "flex overflow-x-auto sm:overflow-x-hidden text-gray-300 justify-start sm:justify-around mb-6 scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-10"} z-30`}>
             <Link 
                 to="/"
                 onClick={() => { HandleCambiarEstado(0) }}

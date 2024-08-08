@@ -39,6 +39,18 @@ export async function getUnPedidoPorUsuario(idUsuario : string,idProducto: strin
     }
 }
 
+
+export async function calcularMontoTotal(idUsuario: string){
+  try {
+    const response = await fetch(`http://localhost:3000/api/carrito-usuario/montoTotal/producto/${idUsuario}`);
+    const data = await response.json();
+    return data;
+} catch (error) {
+    console.log(error);
+    return 0;
+}
+}
+
 export async function crearPedido(idUsuario: string, idProducto: string, nuevoPedido: PedidoCrear){
   try {
   
@@ -130,6 +142,29 @@ export async function updatePedido(idUsuario: string,pedidoId: string, pedido: P
       return data;
     } catch (error) {
       console.error('Error al eliminar el pedido mediante id:', error);
+      return null;
+    }
+  }
+
+  export async function deleteAllPedidos(idUsuario: string){
+    try {
+      const response = await fetch(`http://localhost:3000/api/carrito-usuario/borrarTodos/${idUsuario}`, {
+        method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error en la respuesta del servidor:', errorData); 
+        throw new Error(`HTTP error! status: ${response.status}, message: ${JSON.stringify(errorData)}`);
+      }
+  
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error al eliminar todos los pedidos:', error);
       return null;
     }
   }

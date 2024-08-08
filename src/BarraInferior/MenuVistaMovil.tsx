@@ -9,9 +9,10 @@ interface Props{
 
 export function MenuVistaMovil({ visivilityLateralBar,changeVisivilityLateralBar,changeVisilitySecundaria}:Props){
 
+  // -z-50
 
     return (
-        <nav className={`flex justify-between items-center px-4 py-4 bg-[#1F1D2B] fixed w-full bottom-0 lg:hidden rounded-tl-xl rounded-tr-xl text-gray-400 `}>
+        <nav className={`flex justify-between items-center px-4 py-4 bg-[#1F1D2B] fixed w-full bottom-0 lg:hidden rounded-tl-xl rounded-tr-xl text-gray-400`}>
         <button className='p-2'>
           <RiUser3Line/>
          </button>

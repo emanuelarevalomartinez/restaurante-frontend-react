@@ -17,17 +17,16 @@ import { getBebidas, getPlatosFrios, getPostres, updateBebida, updatePlatoFrio, 
 
 // si es usuario o administrador
 // documentar la api
-// añadir limite de los datos que se devuelvan por pagina
-// añadir paginacion en el frontend
 // crear modal del frontend y las notificaciones emergentes
 
-//! estoy fajao con la paginacion 
+//! hacer que eliminar todo funcione
+//! hacer que total a pagar muestre una  cifra real
 
 //* hay que hacer
 //* terminar de arreglar la posicion de los elementos en la barra lateral
-//* hacer que cuando se recargue la pagina la varible que hace que se oculte la seccion secundaria se mantenga correctamente usando locastorage y lo mismo para la posicion de los elementos en la barra lateral , tratar de mover todo esto al localstorage del usuario
+//*  hacer que cuando se recargue la pagina la varible que hace que la posicion de los elementos en la barra lateral se mantenga , tratar de mover todo esto al localstorage del usuario
 
-//? hacer que las peticiones sean por limite de paginacion a 6 elementos a la vez
+
 //? implementar la funcionalidad de eliminar todos los pedidos en la seccion secundaria
 //? pasar todos los elementos del localstorage para una seccion dentro del localstorage del usuario
 
@@ -406,6 +405,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
             montoTotal:añadirPedido.montoTotal,
           })
           .then( async ()=> {
+            setEscuchaPedidos(true);
             //* tengo que resolver lo de crear un nuevo pedido sin que se duplique con copilot
             //* ver por que cuando presiono en bebidas + se qeda cagando
             if(buscarPlatoCaliente.length !== 0){
@@ -416,9 +416,9 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
                 await getPlatosCalientes()
                 .then( (data)=> {
                   setPlatosCalientes(data.platos);
-                  setEscuchaPlatosCalientes(true);
                 } )
               } )
+              setEscuchaPlatosCalientes(true);
             } else if( buscarPlatoFrio.length !==0 ) {
                await updatePlatoFrio(id,{
                 cantRestante: cantRestante - 1,
@@ -427,9 +427,9 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
                 await getPlatosFrios()
                 .then( (data)=> {
                   setLosPlatosFrios(data.platosFrios);
-                  setEscuchaPlatosFrios(true);
                 } )
               } )
+              setEscuchaPlatosFrios(true);
             } else if( buscarBebida.length !==0 ) {
                 await updateBebida(id,{
                   cantRestante: cantRestante - 1,
@@ -438,9 +438,9 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
                   await getBebidas()
                   .then( (data)=> {
                     setLasBebidas(data.bebidas);
-                    setEscuchaBebidas(true);
                   } )
                 } )
+                setEscuchaBebidas(true);
             } else if( buscarPostre.length !==0 ) {
                 await updatePostre(id,{
                   cantRestante: cantRestante - 1,
@@ -449,9 +449,9 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
                   await getPostres()
                   .then( (data)=> {
                     setLosPostres(data.postres);
-                    setEscuchaPostres(true);
                   } )
                 } )
+                setEscuchaPostres(true);
             }
           } )
         }
