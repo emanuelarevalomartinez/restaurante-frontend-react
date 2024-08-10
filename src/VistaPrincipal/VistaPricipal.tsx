@@ -10,6 +10,7 @@ import { EditarProductos, RechasoEditarProductos } from '../EditarProductos'
 import { Configuracion } from '../Configuracion'
 import { Ordenes } from '../Ordenes'
 import { Cargando } from '../common'
+import { Recursos } from '../Configuracion/Aplicacion'
 
 export function VistaPrincipal() {
 
@@ -37,6 +38,7 @@ const { verOcultarRestoDeSeccion } = useContext(Contexto);
                         <Route path='/RechasoEditarProductos' element={<RechasoEditarProductos />} />
                         <Route path='/Ordenes' element={<Ordenes />} />
                         <Route path='/Configuracion' element={<Configuracion />} />
+                        <Route path='/Recursos' element={<Recursos />} />
                         <Route path='/Cargando' element={<Cargando />} />
                     </Routes>
                 </nav>

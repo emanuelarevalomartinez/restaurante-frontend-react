@@ -5,9 +5,10 @@ interface Props{
     isOpen:boolean;
     cancelar: ()=> void;
     aceptar: ()=> void;
+    disableAceptar?: boolean;
   }
 
-export function Modal({isOpen,cancelar,aceptar,children}:Props){
+export function Modal({isOpen,cancelar,aceptar,disableAceptar,children}:Props){
 
     const referencia = useRef<HTMLDivElement>(null);
 
@@ -50,7 +51,8 @@ export function Modal({isOpen,cancelar,aceptar,children}:Props){
             onClick={ ()=> { cancelar() } }
             >Cancelar</button>
             <button 
-            className="sm:bg-transparent bg-[#6a97ec] hover:bg-[#0e2de0] border-0 sm:border text-black sm:text-blue-500 py-0 px-4 sm:py-2 m-auto rounded-2xl hover:text-white hover:border-transparent"
+            className={`${disableAceptar? "bg-gray-500" : "sm:bg-transparent bg-[#6a97ec] hover:bg-[#0e2de0] border-0 sm:border text-black sm:text-blue-500 hover:text-white hover:border-transparent"} py-0 px-4 sm:py-2 m-auto rounded-2xl`}
+            disabled={disableAceptar}
             onClick={ ()=> {
                 aceptar();
             } }

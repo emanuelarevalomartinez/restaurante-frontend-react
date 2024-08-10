@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useState } from "react";
 import {
+  Notificacion,
   PedidoActualizar,
   Pedidos,
   PlatoCaliente,
@@ -40,6 +41,8 @@ interface ContextoProps {
   setPlatosCalientes: (e: PlatoCaliente[]) => void;
   losPedidos: Pedidos[];
   setlosPedidos:(e: Pedidos[])=> void;
+  lasNotificaciones: Notificacion[];
+  setLasNotificaciones:(e: Notificacion[])=> void;
   lasBebidas: Bebida[];
   setLasBebidas:(e: Bebida[])=> void;
   losPlatosFrios: PlatoFrio[];
@@ -58,6 +61,8 @@ interface ContextoProps {
   setEscuchaPlatosFrios: (e: boolean) => void;
   escuchaPostres: boolean;
   setEscuchaPostres: (e: boolean) => void;
+  escuchaNotificaciones: boolean;
+  setEscuchaNotificaciones: (e: boolean) => void;
   escuchaPlatoCaliente: boolean;
   setEscuchaPlatoCaliente: (e: boolean) => void;
   HandleAddPedido: (
@@ -102,6 +107,8 @@ const defaultContext: ContextoProps = {
   setPlatosCalientes: ()=> {},
   losPedidos: [],
   setlosPedidos: ()=> {},
+  lasNotificaciones: [],
+  setLasNotificaciones: ()=> {},
   lasBebidas: [],
   setLasBebidas: ()=> {},
   losPlatosFrios: [],
@@ -120,6 +127,8 @@ const defaultContext: ContextoProps = {
   setEscuchaPlatosFrios: () => {},
   escuchaPostres: true,
   setEscuchaPostres: () => {},
+  escuchaNotificaciones: true,
+  setEscuchaNotificaciones: () => {},
   escuchaPlatoCaliente: true,
   setEscuchaPlatoCaliente: ()=> {},
   HandleAddPedido: () => {},
@@ -151,6 +160,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     useState<boolean>(false);
   const [platosCalientes, setPlatosCalientes] = useState<PlatoCaliente[]>([]);
   const [losPedidos, setlosPedidos] = useState<Pedidos[]>([]);
+  const [lasNotificaciones, setLasNotificaciones] = useState<Notificacion[]>([]);
   const [losPlatosFrios, setLosPlatosFrios] = useState<PlatoFrio[]>([]);
   const [lasBebidas, setLasBebidas] = useState<Bebida[]>([]);
   const [losPostres, setLosPostres] = useState<Postre[]>([]);
@@ -159,6 +169,7 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
   const [escuchaBebidas, setEscuchaBebidas] = useState(true);
   const [escuchaPlatosFrios, setEscuchaPlatosFrios] = useState(true);
   const [escuchaPostres, setEscuchaPostres] = useState(true);
+  const [escuchaNotificaciones, setEscuchaNotificaciones] = useState(true);
   const [escuchaPlatoCaliente, setEscuchaPlatoCaliente] = useState(true);
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   // const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] =
@@ -705,6 +716,8 @@ if (findProductoExistente.length !== 0) {
         setPlatosCalientes:setPlatosCalientes,
         losPedidos: losPedidos,
         setlosPedidos:setlosPedidos,
+        lasNotificaciones: lasNotificaciones,
+        setLasNotificaciones:setLasNotificaciones,
         lasBebidas: lasBebidas,
         setLasBebidas:setLasBebidas,
         losPlatosFrios: losPlatosFrios,
@@ -723,6 +736,8 @@ if (findProductoExistente.length !== 0) {
         setEscuchaPlatosFrios: setEscuchaPlatosFrios,
         escuchaPostres: escuchaPostres,
         setEscuchaPostres: setEscuchaPostres,
+        escuchaNotificaciones: escuchaNotificaciones,
+        setEscuchaNotificaciones: setEscuchaNotificaciones,
         escuchaPlatoCaliente: escuchaPlatoCaliente,
         setEscuchaPlatoCaliente: setEscuchaPlatoCaliente,
         HandleAddPedido: HandleAddPedido,

@@ -1,15 +1,21 @@
 
 import { Notificacion } from "./Notificacion";
-import { Seleccionar } from "../common";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Cargando, NoHay, Seleccionar } from "../common";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { Contexto } from "../Contexto";
+import { getLasNotificaciones } from "./las-notificaciones.servicios";
+import { Auth } from "../Autentificacion/Auth";
 
 
 export function Notificaciones(){
 
     const [isOpen, setIsOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [seleccion, setSeleccion] = useState("Ultimas");
     const [elementos] = useState(["Ultimas", "Primeras"]);
     const referencia = useRef<HTMLDivElement>(null);
+
+    const { lasNotificaciones, setLasNotificaciones, escuchaNotificaciones, setEscuchaNotificaciones } = useContext(Contexto);
   
     const hacerClick = () => setIsOpen(!isOpen);
   
@@ -30,14 +36,43 @@ export function Notificaciones(){
         setIsOpen(false);
       }
     };
+
+    const obtenerLasNotificaciones = async () => {
+      setIsLoading(true);
+     const auth = Auth();
+     if(auth){
+       const notificaciones = await getLasNotificaciones(auth.idUsuario, seleccion === "Ultimas");
+       setLasNotificaciones(notificaciones);
+       setEscuchaNotificaciones(false);
+       // calcularTotalPaginas(totalDeProductos);
+       setIsLoading(false);
+     }
+    };
   
     useEffect(() => {
+      obtenerLasNotificaciones();
       document.addEventListener("mousedown", handleHacerClickFuera);
   
       return () => {
         document.removeEventListener("mousedown", handleHacerClickFuera);
       };
-    }, []);
+    }, [seleccion,escuchaNotificaciones]);
+
+    if(isLoading){
+       return(
+        <div className="mt-48 sm:mt-44 md:mt-40 lg:mt-40 mx-2">
+          <Cargando/>
+        </div>
+       )
+    }
+
+    if(!lasNotificaciones.length){
+        return(
+          <div className="mt-48 sm:mt-44 md:mt-40 lg:mt-40 mx-2">
+            <NoHay elemento="Notificaciones"/>
+          </div>
+        )
+    }
 
 
     return(
@@ -55,11 +90,20 @@ export function Notificaciones(){
           ancho={`w-32`}
         />
             </div>
-       <Notificacion/>
-       <Notificacion/>
-       <Notificacion/>
-       <Notificacion/>
-       <Notificacion/>
+            {
+                lasNotificaciones.map( (notificacion, index)=> (
+                 <Notificacion
+                 key={index}
+                 idNotificacion={notificacion.idNotificacion}
+                 fecha={notificacion.fecha}
+                 hora={notificacion.hora}
+                 mensaje={notificacion.mensaje}
+                 tipo={notificacion.tipo}
+                 >
+                 </Notificacion>
+                )
+                 )
+            }
         </div>
     )
 }

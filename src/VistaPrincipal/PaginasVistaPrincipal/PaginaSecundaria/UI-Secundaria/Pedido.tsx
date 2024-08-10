@@ -27,6 +27,7 @@ export function Pedido({
   imagen,
   tipoProducto,
 }: Props) {
+
   const [eliminarProducto, seteliminarProducto] = useState(false);
   const getColorProducto = (tipo: string) => {
     switch (tipo) {
@@ -49,6 +50,39 @@ export function Pedido({
     setEscuchaPlatosFrios,
     setEscuchaPostres,
   } = useContext(Contexto);
+
+    async function eliminarPedido(){
+      await getUnPedido(identificador).then((data) => {
+        const tipoProducto = data.tipoProducto;
+
+        if (tipoProducto == "Plato Caliente") {
+          updatePlatoCalienteByPedido(identificadorProducto, cantidad);
+          deletePedido(identificador).then(() => {
+            setEscuchaPedidos(true);
+            setEscuchaPlatosCalientes(true);
+          });
+      } else if (tipoProducto == "Plato Frio"){
+           updatePLatoFrioByPedido(identificadorProducto, cantidad);
+          deletePedido(identificador).then(() => {
+            setEscuchaPedidos(true);
+            setEscuchaPlatosFrios(true);
+          });
+      } else if (tipoProducto == "Bebida") {
+          updateBebidaByPedido(identificadorProducto, cantidad);
+          deletePedido(identificador).then(() => {
+            setEscuchaPedidos(true);
+            setEscuchaBebidas(true);
+          });
+      } else if (tipoProducto == "Postre") {
+          updatePostreByPedido(identificadorProducto, cantidad);
+         deletePedido(identificador).then(() => {
+           setEscuchaPedidos(true);
+           setEscuchaPostres(true);
+         });
+        }
+      });
+    }
+
 
 
   return (
@@ -81,36 +115,8 @@ export function Pedido({
           className={`mx-1 rounded-lg border text-red-500 border-red-500 ${
             eliminarProducto ? "bg-red-500 text-yellow-300 border-none" : ""
           } flex items-center justify-center`}
-          onClick={async () => {
-            await getUnPedido(identificador).then((data) => {
-              const tipoProducto = data.tipoProducto;
-
-              if (tipoProducto == "Plato Caliente") {
-                updatePlatoCalienteByPedido(identificadorProducto, cantidad);
-                deletePedido(identificador).then(() => {
-                  setEscuchaPedidos(true);
-                  setEscuchaPlatosCalientes(true);
-                });
-            } else if (tipoProducto == "Plato Frio"){
-                 updatePLatoFrioByPedido(identificadorProducto, cantidad);
-                deletePedido(identificador).then(() => {
-                  setEscuchaPedidos(true);
-                  setEscuchaPlatosFrios(true);
-                });
-            } else if (tipoProducto == "Bebida") {
-                updateBebidaByPedido(identificadorProducto, cantidad);
-                deletePedido(identificador).then(() => {
-                  setEscuchaPedidos(true);
-                  setEscuchaBebidas(true);
-                });
-            } else if (tipoProducto == "Postre") {
-                updatePostreByPedido(identificadorProducto, cantidad);
-               deletePedido(identificador).then(() => {
-                 setEscuchaPedidos(true);
-                 setEscuchaPostres(true);
-               });
-              }
-            });
+          onClick={ () => {
+            eliminarPedido();
           }}
         >
           {eliminarProducto ? <RiDeleteBin6Fill /> : <RiDeleteBin6Line />}

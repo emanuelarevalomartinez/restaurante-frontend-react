@@ -56,7 +56,7 @@ export function AcercaDe() {
             <div className="w-full p-2">
               <button className="mx-auto flex rounded border-0 bg-indigo-500 py-2 px-8 text-lg text-white hover:bg-indigo-600 focus:outline-none"
               onClick={()=> {
-                alert("Gracias por envia su comentario");
+                alert("Esta funcionalidad aún no esta disponible entendemos su intención y lo agradecemos");
               }}
               >
                 Enviar

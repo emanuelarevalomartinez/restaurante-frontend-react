@@ -8,7 +8,8 @@ import { useContext, useEffect, useState } from "react";
 import { Contexto } from "../Contexto";
 import { deleteAllPedidos, getLosPedidos } from "./PaginasVistaPrincipal/PaginaSecundaria/Secundaria-Servicios/los-pedidos.servicios";
 import { Auth } from "../Autentificacion/Auth";
-import { Modal } from "../common";
+import { Modal, NotificacionEmergente } from "../common";
+import { crearNotificacion } from "../Notificaciones";
 
 interface Props {
   visivility: boolean;
@@ -26,6 +27,7 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
     setEscuchaPlatosCalientes,
     setEscuchaPlatosFrios,
     setEscuchaPostres,
+    setEscuchaNotificaciones,
   } = useContext(Contexto);
 
   useEffect(() => {
@@ -41,6 +43,14 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
   }, [escuchaPedidos]);
 
   const [open, setOpen] = useState(false);
+  const [tipoNotificacion, setTipoNotificacion] = useState("");
+  const [mensajeNotificacion, setMensajeNotificacion] = useState("");
+  const [verNotificacion, setVerNotificacion] = useState(false);
+
+  const intervaloNotificacionEmergente = () => {
+    setVerNotificacion(true);
+    setTimeout(() => setVerNotificacion(false), 3000);
+  };
 
   function cancelar() {
     setOpen(false);
@@ -48,26 +58,58 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
 
   function aceptar() {
     const auth = Auth();
+  
+    if (auth) {
 
-    if(auth){
-       const borrarTodosLosPedidos = async ()=> {
-          await deleteAllPedidos(auth.idUsuario)
-          .then( ()=> {
-            setEscuchaPedidos(true);
-            setEscuchaBebidas(true);
-            setEscuchaPlatosCalientes(true);
-            setEscuchaPlatosFrios(true);
-            setEscuchaPostres(true);
-            setOpen(false);
-          } )
-       }
-       borrarTodosLosPedidos();
+      const actualizarEstados = () => {
+        setEscuchaPedidos(true);
+        setEscuchaBebidas(true);
+        setEscuchaPlatosCalientes(true);
+        setEscuchaPlatosFrios(true);
+        setEscuchaPostres(true);
+        setOpen(false);
+      };
+
+      const crearNuevaNotificacion = async (nuevoMensaje: string, nuevoTipo: string) => {
+        await crearNotificacion(auth.idUsuario,{
+          mensaje: nuevoMensaje,
+          tipo: nuevoTipo,
+        })
+        .then( ()=> {
+          setEscuchaNotificaciones(true);
+        } )
+      }
+
+   
+  
+      const borrarTodosLosPedidos = async () => {
+        try {
+          const resultado = await deleteAllPedidos(auth.idUsuario);
+  
+          if (resultado) {
+            setMensajeNotificacion("Todos los productos fueron eliminados exitosamente del carrito de las compras");
+            setTipoNotificacion("Correcto");
+          } else {
+            setMensajeNotificacion("No fue posible eliminar todos los productos del carrito de las compras");
+            setTipoNotificacion("Error");
+          }
+        } catch (error) {
+          setMensajeNotificacion("No fue posible eliminar todos los productos del carrito");
+          setTipoNotificacion("Error");
+        } finally {
+          actualizarEstados();
+          intervaloNotificacionEmergente();
+        }
+      };
+      borrarTodosLosPedidos();
+      crearNuevaNotificacion(mensajeNotificacion,tipoNotificacion);
     }
   }
 
+
   return (
     <>
-      <Modal isOpen={open} cancelar={cancelar} aceptar={aceptar}>
+      <Modal isOpen={open} cancelar={cancelar} aceptar={aceptar} disableAceptar={losPedidos.length == 0}>
       <div className="w-full h-full justify-center items-center flex">
       {losPedidos.length == 0 ? (
             <div>
@@ -84,6 +126,8 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
           )}
           </div>
       </Modal>
+
+      { verNotificacion && <NotificacionEmergente tipo={tipoNotificacion} mensaje={mensajeNotificacion}/> }
 
       <div
         className={`${verOcultarRestoDeSeccion ? "hidden -right-full" : ""}`}

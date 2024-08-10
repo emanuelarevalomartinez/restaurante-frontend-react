@@ -1,33 +1,94 @@
-import { RiCloseLine } from "react-icons/ri";
+import { useContext } from "react";
+import { RiAlertLine, RiCheckLine, RiCloseLine, RiSpam2Line } from "react-icons/ri";
+import { Contexto } from "../Contexto";
+import { deleteNotificacion } from "./las-notificaciones.servicios";
+
+interface Props {
+    idNotificacion:string;
+    tipo: string;
+    mensaje: string;
+    fecha:string;
+    hora:string;
+  }
 
 
-export function Notificacion(){
+export function Notificacion({idNotificacion,mensaje, tipo,fecha,hora}:Props) {
 
-// colors
-// ok => bg-green-800 text-white
-// alert=> bg-orange-500 text-white
-// critical => bg-red-800 text-white
+  const { setEscuchaNotificaciones } = useContext(Contexto);
+
+  async function eliminarNotificacion(){
+    await deleteNotificacion(idNotificacion)
+    .then(() => {
+       setEscuchaNotificaciones(true);
+    });
+  }
+
+  const getTipoNotificacion = (tipo: string) => {
+    switch (tipo) {
+      case "Correcto":
+        return "bg-green-100 text-green-500";
+      case "Advertencia":
+        return "bg-yellow-100 text-yellow-500";
+      case "Error":
+        return "bg-red-100 text-red-500";
+    }
+  };
+
+  const getColorNotificacion = (tipo: string) => {
+    switch (tipo) {
+      case "Correcto":
+        return "bg-green-600";
+      case "Advertencia":
+        return "bg-yellow-600";
+      case "Error":
+        return "bg-red-600";
+    }
+  };
+
+  return (
+    <div className={`rounded-lg text-gray-50 p-4 my-4 ${getColorNotificacion(tipo)}`}>
+      <div className="flex flex-col">
 
 
-    return(
-        <div className="m-4 rounded-lg bg-green-800 text-white px-2 sm:px-8 py-2">
-            <div className="grid grid-cols-4 sm:grid-cols-12 p-4">
-            <p className="row-start-1 sm:row-start-auto col-start-1 sm:col-start-auto col-span-3 sm:col-span-4 md:col-span-5 ">Tipo de notificación </p>
-            <p className="row-start-2 sm:row-start-auto col-span-3 sm:col-span-5 md:col-span-4"> 25 de Septiembre de 2043 </p>
-            <p className="row-start-3 sm:row-start-auto col-span-3 sm:col-span-2">13 : 33 p.m.</p>
-            
-                <div className="row-start-1 row-span-3 sm:row-auto sm:row-start-auto col-start-4 sm:col-start-auto col-span-1 sm:col-span-1 text-center flex cursor-pointer ">
-                <div className="w-2/3 h-2/3 sm:w-full sm:h-full m-auto flex justify-center items-center rounded-md  bg-[#1F1D2B] text-red-800"
-            onClick={()=> {
+        <div className=" flex w-full h-10">
+          <p className="flex w-10/12 sm:w-11/12 items-center text-2xl gap-2">
+          <span className={`border p-2 rounded-full ${getTipoNotificacion(tipo)}`}>
+
+                    { tipo == "Correcto" && <RiCheckLine className=""/> }
+                    { tipo == "Advertencia" && <RiAlertLine className=""/> }
+                    { tipo == "Error" && <RiSpam2Line className=""/> }
+          </span>
+            {tipo}
+          </p>
+          <div
+            className=" w-2/12 sm:w-1/12 flex justify-center items-center cursor-pointer border rounded-xl text-black hover:bg-red-500 hover:border-red-500 hover:text-white"
+            onClick={() => {
+              console.log("hola");
+              eliminarNotificacion();
             }}
-            
-            >
-                <RiCloseLine/></div>
-                </div>
-            </div>
-            <div className="py-2">
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquam fuga numquam, repudiandae sint ut dicta porro iure repellendus facere illum quos minima unde, odit asperiores quidem cumque, maxime nemo tempore?</p>
-            </div>
+          >
+            <RiCloseLine />
+          </div>
         </div>
-    )
+
+        <div className="text-lg flex flex-col">
+          <p
+          >
+            {fecha}
+          </p>
+
+          <p
+          >
+            {hora}
+          </p>
+        </div>
+      </div>
+
+      <div className="pt-2">
+        <p>
+          {mensaje}
+        </p>
+      </div>
+    </div>
+  );
 }

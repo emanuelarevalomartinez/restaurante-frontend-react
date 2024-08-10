@@ -42,7 +42,7 @@ export function Enviar() {
           {totalAPagar == 0 ? (
             <div>
                 <p className="text-center text-3xl">
-                  Aún notiene productos en el carrito para ejecutar esta acción.
+                  Aún no tiene productos en el carrito para ejecutar esta acción.
                 </p>
             </div>
           ) : (

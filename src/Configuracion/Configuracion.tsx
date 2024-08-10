@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
 
 export function Configuracion() {
+
+  const navigate = useNavigate();
+
   const [chequeado, setchequeado] = useState(false);
 
   return (
@@ -73,7 +77,12 @@ export function Configuracion() {
             <hr className="border border-red-500" />
 
             <div>
-              <button className="flex items-center text-white m-auto border-b border-blue-500 hover:text-blue-500 hover:border-b-white">
+              <button 
+              className="flex items-center text-white m-auto border-b border-blue-500 hover:text-blue-500 hover:border-b-white"
+              onClick={ ()=> {
+                navigate("/Recursos");
+              } }
+              >
                 Recursos
               </button>
             </div>

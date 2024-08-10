@@ -58,7 +58,7 @@ export function PlatosCalientes() {
   
 
   if (!platosCalientes.length) {
-    return <NoHay elemento="Platos Calientes" />;
+    return <NoHay elemento="Platos Calientes"/>;
   }
 
   return (

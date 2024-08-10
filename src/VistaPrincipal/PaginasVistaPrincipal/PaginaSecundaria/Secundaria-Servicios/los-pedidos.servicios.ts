@@ -116,8 +116,6 @@ export async function updatePedido(idUsuario: string,pedidoId: string, pedido: P
         throw new Error(`HTTP error! status: ${response.status}, message: ${JSON.stringify(errorData)}`);
       }
   
-      const data = await response.json();
-      return data;
     } catch (error) {
       console.error('Error al eliminar el pedido mediante usuario:', error);
       return null;
@@ -138,8 +136,6 @@ export async function updatePedido(idUsuario: string,pedidoId: string, pedido: P
         throw new Error(`HTTP error! status: ${response.status}, message: ${JSON.stringify(errorData)}`);
       }
   
-      const data = await response.json();
-      return data;
     } catch (error) {
       console.error('Error al eliminar el pedido mediante id:', error);
       return null;
