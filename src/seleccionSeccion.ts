@@ -7,11 +7,11 @@ export const seleccionSeccion: SeleccionSeccion[] = [
     seleccionado: true,
     },
     {
-    nombre: "editar",
+    nombre: "RechasoEditarProductos",
     seleccionado: false,
     },
     {
-    nombre: "carrito",
+    nombre: "Ordenes",
     seleccionado: false,
     },
     {

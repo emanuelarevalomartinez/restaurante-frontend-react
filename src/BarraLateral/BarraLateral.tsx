@@ -1,3 +1,5 @@
+
+
 import {
   RiHome6Line,
   RiPieChartLine,
@@ -26,7 +28,6 @@ export function BarraLateral({ visivility }: Props) {
   } = useContext(Contexto);
 
   const navigate = useNavigate();
-
   const [open, setOpen] = useState(false);
 
   function cancelar() {
@@ -38,16 +39,28 @@ export function BarraLateral({ visivility }: Props) {
     setOpen(false);
   }
 
+  function handleHacerClickEnSeccion(seccion: string) {
+    if (seccion === "salir") {
+      setOpen(true);
+    } else {
+      const isHome = seccion === "/";
+      localStorage.setItem("verSeccionesAmpliadas", JSON.stringify(!isHome));
+  
+      handleVerOcultarContenido(!isHome);
+      navigate(seccion);
+      handleChangeSelecionBarraLateral(seccion);
+    }
+  }
+
   return (
     <>
-
-<Modal isOpen={open} cancelar={cancelar} aceptar={aceptar}>
-            <div className="w-full h-full justify-center items-center flex">
-              <p className="text-center text-3xl">
-                ¿Estas seguro de que quieres salir?
-              </p>
-            </div>
-          </Modal>
+      <Modal isOpen={open} cancelar={cancelar} aceptar={aceptar}>
+        <div className="w-full h-full justify-center items-center flex">
+          <p className="text-center text-3xl">
+            ¿Estás seguro de que quieres salir?
+          </p>
+        </div>
+      </Modal>
 
       <div
         className={`flex flex-col justify-between bg-[#1F1D2B] -left-full fixed top-0 w-28 h-full py-6 rounded-t-xl rounded-b-xl lg:left-0 ${
@@ -62,120 +75,26 @@ export function BarraLateral({ visivility }: Props) {
               </h1>
             </li>
 
-            <LI selected={selectElementBarraLateral[0].seleccionado}>
-              <A
-                selected={selectElementBarraLateral[0].seleccionado}
-                onClick={() => {
-                  handleVerOcultarContenido(false);
-                  navigate("/");
-                  localStorage.setItem(
-                    "posicionBarraNavegacion",
-                    JSON.stringify(0)
-                  );
-                  localStorage.setItem("ver", JSON.stringify(false));
-                  handleChangeSelecionBarraLateral("/");
-                }}
-              >
-                <RiHome6Line className="text-2xl" />
-              </A>
-            </LI>
-
-            <LI selected={selectElementBarraLateral[1].seleccionado}>
-              <A
-                selected={selectElementBarraLateral[1].seleccionado}
-                onClick={() => {
-                  handleVerOcultarContenido(true);
-                  navigate("/RechasoEditarProductos");
-                  // handleChangeSelecionBarraLateral("editar");
-                  const a = "editar";
-                  localStorage.setItem("barra", JSON.stringify(a));
-                  localStorage.setItem("ver", JSON.stringify(true));
-                  // editar
-                }}
-              >
-                <RiEditLine className="text-2xl" />
-              </A>
-            </LI>
-
-            <LI selected={selectElementBarraLateral[2].seleccionado}>
-              <A
-                selected={selectElementBarraLateral[2].seleccionado}
-                onClick={() => {
-                  handleVerOcultarContenido(true);
-                  navigate("/Ordenes");
-                  handleChangeSelecionBarraLateral("carrito");
-                  localStorage.setItem("ver", JSON.stringify(true));
-                  // carrito
-                }}
-              >
-                <RiPieChartLine className="text-2xl" />
-              </A>
-            </LI>
-
-            <LI selected={selectElementBarraLateral[3].seleccionado}>
-              <A
-                selected={selectElementBarraLateral[3].seleccionado}
-                onClick={() => {
-                  handleVerOcultarContenido(true);
-                  navigate("/AcercaDe");
-                  handleChangeSelecionBarraLateral("acercaDe");
-                  localStorage.setItem("ver", JSON.stringify(true));
-                  // acerca de
-                }}
-              >
-                <RiMailLine className="text-2xl" />
-              </A>
-            </LI>
-
-            <LI selected={selectElementBarraLateral[4].seleccionado}>
-              <A
-                selected={selectElementBarraLateral[4].seleccionado}
-                onClick={() => {
-                  handleVerOcultarContenido(true);
-                  navigate("Notificaciones");
-                  handleChangeSelecionBarraLateral("notificaciones");
-                  localStorage.setItem("ver", JSON.stringify(true));
-                  //notificaciones
-                  // opuesta <RiNotificationFill />
-                }}
-              >
-                <RiNotificationLine className="text-2xl" />
-              </A>
-            </LI>
-
-            <LI selected={selectElementBarraLateral[5].seleccionado}>
-              <A
-                selected={selectElementBarraLateral[5].seleccionado}
-                onClick={() => {
-                  handleVerOcultarContenido(true);
-                  navigate("/Configuracion");
-                  handleChangeSelecionBarraLateral("configuracion");
-                  localStorage.setItem("ver", JSON.stringify(true));
-                  // ajustes
-                }}
-              >
-                <RiSettings4Line className="text-2xl" />
-              </A>
-            </LI>
-          </ul>
-        </div>
-
-        <div>
-          <ul className="pl-4">
-            <LI selected={selectElementBarraLateral[6].seleccionado}>
-              <A
-                selected={selectElementBarraLateral[6].seleccionado}
-                onClick={() => {
-                  setOpen(true);
-                  //  handleChangeSelecionBarraLateral("salir");
-                }}
-              >
-                <RiLogoutCircleRLine className="text-2xl" />
-              </A>
-            </LI>
+            {selectElementBarraLateral.map((seccion, index) => (
+              <LI key={index} selected={seccion.seleccionado}>
+                <A
+                  selected={seccion.seleccionado}
+                  onClick={() => handleHacerClickEnSeccion(seccion.nombre)}
+                >
+                  {index === 0 && <RiHome6Line className="text-2xl" />}
+                  {index === 1 && <RiEditLine className="text-2xl" />}
+                  {index === 2 && <RiPieChartLine className="text-2xl" />}
+                  {index === 3 && <RiMailLine className="text-2xl" />}
+                  {index === 4 && <RiNotificationLine className="text-2xl" />}
+                  {index === 5 && <RiSettings4Line className="text-2xl" />}
+                  {index === 6 && <RiLogoutCircleRLine className="text-2xl" />}
+                </A>
+              </LI>
+            ))}
           </ul>
         </div>
       </div>
     </>
   );
 }
+

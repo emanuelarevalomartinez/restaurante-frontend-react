@@ -1,14 +1,93 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { RiDeleteBin6Line, RiEditLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import { Chequear, Modal } from "../common";
+import { Auth } from "../Autentificacion/Auth";
+import { Contexto } from "../Contexto";
+import { deleteAllNotificacionesByUsuario, getLasNotificaciones } from "../Notificaciones";
 
 export function Configuracion() {
 
   const navigate = useNavigate();
 
-  const [chequeado, setchequeado] = useState(false);
+  const auth = Auth();
+
+  const [chequeado, setChequeado] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [noHayNotificaciones, setNoHayNotificaciones] = useState(true);
+
+  const {  lasNotificaciones, setLasNotificaciones } = useContext(Contexto);
+
+
+  function cancelar() {
+    setOpen(false);
+  }
+
+  function aceptar() {
+     setOpen(true);
+
+     const eliminarTodasNotificaciones = async () => {
+      if(auth){
+         await deleteAllNotificacionesByUsuario(auth.idUsuario)
+         .then( ()=> {
+          console.log("correcto");
+          
+         } )
+         .catch( ()=> {
+          console.log("error");
+          
+         } )
+         .finally( ()=> {
+          setOpen(false);
+         } )
+      }
+    }
+    eliminarTodasNotificaciones();
+    setLasNotificaciones([]);
+    
+  }
+
+ 
+  useEffect( () => {
+   const verificarHayNotificaciones = async() => {
+       if(auth){
+         const verificarExistenNotificciones = await getLasNotificaciones(auth.idUsuario);
+         let arregloNotificaciones : [] = verificarExistenNotificciones;
+
+         if(arregloNotificaciones.length !== 0){
+          setNoHayNotificaciones(false);
+         } else {
+          setNoHayNotificaciones(true);
+         }
+       }
+   }
+   verificarHayNotificaciones();
+  }, [lasNotificaciones])
+  
+  
+
 
   return (
+    <>
+
+<Modal isOpen={open} cancelar={cancelar} aceptar={aceptar} disableAceptar={noHayNotificaciones}>
+      <div className="w-full h-full justify-center items-center flex">
+      {lasNotificaciones.length == 0 ? (
+            <div>
+                <p className="text-center text-3xl">
+                  Aún no tiene ninguna notificación que borrar.
+                </p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-center text-3xl">
+              ¿Estas seguro de que quieres eliminar todas tus notificaciones?
+              </p>
+            </div>
+          )}
+          </div>
+      </Modal>
+
     <div className="mt-48 sm:mt-44 md:mt-40 lg:mt-40 mx-2">
       <div className="flex items-center justify-between mb-2">
         <h2 className="text-xl text-gray-300">Configuración</h2>
@@ -28,7 +107,7 @@ export function Configuracion() {
             </div>
           </div>
           <div className="flex py-2 justify-center text-wrap text-white">
-            <p>@NombreUsuarioConUnNombreLargo</p>
+            <p>{ auth?.nombre.toUpperCase() }</p>
           </div>
         </div>
 
@@ -50,17 +129,7 @@ export function Configuracion() {
             <div>
               <div className="flex gap-2 h-6 justify-center">
                 <p className="text-white">Traducir ES </p>
-                <label className="relative inline-flex cursor-pointer items-center">
-                  <input
-                    type="checkbox"
-                    className="peer sr-only"
-                    onChange={() => {
-                      setchequeado(!chequeado);
-                    }}
-                    defaultChecked={chequeado}
-                  />
-                  <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white  peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:border-gray-600 dark:bg-gray-700 dark:peer-focus:ring-blue-800"></div>
-                </label>
+                <Chequear chequeado={chequeado} setChequeado={setChequeado}/>
                 <p className=" text-white">EN </p>
               </div>
             </div>
@@ -69,7 +138,13 @@ export function Configuracion() {
 
             <div className="flex py-2 text-xl sm:text-base text-white">
               <p>Borrar las Notificaciones</p>
-              <button className="flex gap-2 items-center bg-[#6a97ec] hover:bg-[#0e2de0] border-0 sm:border text-black py-0 px-4 sm:py-2 m-auto rounded-2xl hover:text-white hover:border-transparent">
+              <button 
+              className="flex gap-2 items-center bg-[#6a97ec] hover:bg-[#0e2de0] border-0 sm:border text-black py-0 px-4 sm:py-2 m-auto rounded-2xl hover:text-white hover:border-transparent"
+              onClick={ ()=> {
+                setOpen(true);
+                
+              } }
+              >
                 <RiDeleteBin6Line />
               </button>
             </div>
@@ -98,5 +173,6 @@ export function Configuracion() {
         </div>
       </div>
     </div>
+    </>
   );
 }

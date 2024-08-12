@@ -62,11 +62,11 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
     if (auth) {
 
       const actualizarEstados = () => {
-        setEscuchaPedidos(true);
         setEscuchaBebidas(true);
         setEscuchaPlatosCalientes(true);
         setEscuchaPlatosFrios(true);
         setEscuchaPostres(true);
+        setEscuchaPedidos(true);
         setOpen(false);
       };
 
@@ -89,20 +89,22 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
           if (resultado) {
             setMensajeNotificacion("Todos los productos fueron eliminados exitosamente del carrito de las compras");
             setTipoNotificacion("Correcto");
+            crearNuevaNotificacion("Todos los productos fueron eliminados exitosamente del carrito de las compras","Correcto");
           } else {
             setMensajeNotificacion("No fue posible eliminar todos los productos del carrito de las compras");
             setTipoNotificacion("Error");
+            crearNuevaNotificacion("No fue posible eliminar todos los productos del carrito de las compras","Error");
           }
         } catch (error) {
           setMensajeNotificacion("No fue posible eliminar todos los productos del carrito");
           setTipoNotificacion("Error");
+          crearNuevaNotificacion("No fue posible eliminar todos los productos del carrito de las compras","Error");
         } finally {
           actualizarEstados();
           intervaloNotificacionEmergente();
         }
       };
       borrarTodosLosPedidos();
-      crearNuevaNotificacion(mensajeNotificacion,tipoNotificacion);
     }
   }
 

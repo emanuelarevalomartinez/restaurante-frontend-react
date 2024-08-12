@@ -6,6 +6,8 @@ export function Recursos(){
 
     const navigate = useNavigate();
 
+    // TODO: Hay que colocar todos los datos pertinentes aqui y ajustar el texto
+
     return(
         <div className="mt-48 sm:mt-44 md:mt-40 lg:mt-40 mx-2">
            <div className="flex items-center justify-between mb-2">

@@ -1,4 +1,4 @@
-import { ReactNode, createContext, useState } from "react";
+import { ReactNode, createContext, useEffect, useState } from "react";
 import {
   Notificacion,
   PedidoActualizar,
@@ -16,20 +16,9 @@ import { Bebida } from "./Interfaces/Bebida";
 import { getPlatosCalientes, updatePlatoCaliente } from "./VistaPrincipal/PaginasVistaPrincipal/UI";
 import { getBebidas, getPlatosFrios, getPostres, updateBebida, updatePlatoFrio, updatePostre } from "./VistaPrincipal/PaginasVistaPrincipal";
 
-// si es usuario o administrador
-// documentar la api
-// crear modal del frontend y las notificaciones emergentes
-
-//! hacer que eliminar todo funcione
-//! hacer que total a pagar muestre una  cifra real
-
-//* hay que hacer
-//* terminar de arreglar la posicion de los elementos en la barra lateral
-//*  hacer que cuando se recargue la pagina la varible que hace que la posicion de los elementos en la barra lateral se mantenga , tratar de mover todo esto al localstorage del usuario
-
-
-//? implementar la funcionalidad de eliminar todos los pedidos en la seccion secundaria
-//? pasar todos los elementos del localstorage para una seccion dentro del localstorage del usuario
+//TODO  la validacion del formulario del login y la validacion de los datos para register en el backend y el redirigir de la pagina
+//TODO: si es usuario o administrador se tiene que  mostrar la seccion editar o no
+// TODO: documentar la api del backend
 
 interface ContextoProps {
   barraVistaMovil: boolean;
@@ -172,23 +161,11 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
   const [escuchaNotificaciones, setEscuchaNotificaciones] = useState(true);
   const [escuchaPlatoCaliente, setEscuchaPlatoCaliente] = useState(true);
   const [usuario, setUsuario] = useState<Usuario | null>(null);
-  // const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] =
-  //   useState(false);
   const [selectElementBarraLateral, setSelectElementBarraLateral] =
     useState(seleccionSeccion);
-  // const [selectElementBarraLateral, setSelectElementBarraLateral] =
-  // useState(()=>{
-  //   const barra = localStorage.getItem("barra");
-  //   if(barra){
-  //       const position = JSON.parse(barra);
-  //       return position;
-  //   } else {
-  //     return ;
-  //   }
-  // });
   const [verOcultarRestoDeSeccion, setverOcultarRestoDeSeccion] =
     useState(()=>{
-      const ver = localStorage.getItem("ver");
+      const ver = localStorage.getItem("verSeccionesAmpliadas");
       if(ver){
         const status = JSON.parse(ver);
         return status;
@@ -231,9 +208,15 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
 
   function logout(){
     localStorage.removeItem('posicionBarraNavegacion');
-      localStorage.removeItem('ver');
+      localStorage.removeItem('verSeccionesAmpliadas');
       localStorage.removeItem('barra');
     localStorage.removeItem('usuario');
+
+    localStorage.removeItem('paginaActual-platosCalientes');
+    localStorage.removeItem('paginaActual-platosFrios');
+    localStorage.removeItem('paginaActual-bebidas');
+    localStorage.removeItem('paginaActual-postres');
+    localStorage.removeItem('seccionBarraLateralAVisualizar');
                   setAcceso(false);
                   setUsuario(null);
   }
@@ -417,8 +400,6 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
           })
           .then( async ()=> {
             setEscuchaPedidos(true);
-            //* tengo que resolver lo de crear un nuevo pedido sin que se duplique con copilot
-            //* ver por que cuando presiono en bebidas + se qeda cagando
             if(buscarPlatoCaliente.length !== 0){
               await updatePlatoCaliente(id,{
                 cantRestante: cantRestante - 1,
@@ -668,40 +649,29 @@ if (findProductoExistente.length !== 0) {
     } )
 
   }
-
-
-    
   } else {
-
 }
-
-
-
   }
 
   function handleVerOcultarContenido(status: boolean) {
     setverOcultarRestoDeSeccion(status);
   }
 
-  function handleChangeSelecionBarraLateral(
-    seccionEscogidaAVisualizar: string
-  ) {
-    const newSelectElementosBarraLateral = selectElementBarraLateral;
-    newSelectElementosBarraLateral.forEach((seccionActual, index) => {
-      if (seccionActual.nombre === seccionEscogidaAVisualizar) {
-        newSelectElementosBarraLateral[index] = {
-          ...seccionActual,
-          seleccionado: true,
-        };
-      } else {
-        newSelectElementosBarraLateral[index] = {
-          ...seccionActual,
-          seleccionado: false,
-        };
-      }
-    });
+
+  function handleChangeSelecionBarraLateral(seccionEscogidaAVisualizar: string) {
+    const newSelectElementosBarraLateral = selectElementBarraLateral.map(seccion => ({
+        ...seccion,
+        seleccionado: seccion.nombre === seccionEscogidaAVisualizar,
+    }));
     setSelectElementBarraLateral(newSelectElementosBarraLateral);
-  }
+    localStorage.setItem("seccionBarraLateralAVisualizar", seccionEscogidaAVisualizar);
+}
+
+useEffect(() => {
+  const cargarUltimaSeccionBarraLateral = localStorage.getItem("seccionBarraLateralAVisualizar") || "/";
+  handleChangeSelecionBarraLateral(cargarUltimaSeccionBarraLateral);
+}, []);
+
 
 
   return (

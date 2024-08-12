@@ -38,6 +38,8 @@ export function NotificacionEmergente({ tipo, mensaje, duracion = 3000 }: Props)
   if (!visible) return null;
 
   return (
+    <div className="fixed w-screen h-screen z-10 top-0 left-1/2 -translate-x-1/2">
+
     <div className="fixed top-2 left-1/2 -translate-x-1/2 z-10 rounded-xl bg-white p-4 text-sm w-3/4 sm:w-1/2 lg:w-1/4">
         <p 
         className="top-6 absolute right-4 ml-auto text-slate-500 hover:text-slate-900"
@@ -60,11 +62,12 @@ export function NotificacionEmergente({ tipo, mensaje, duracion = 3000 }: Props)
             </p>
           </div>
         </div>
-        <div>
+        <div className="text-gray-600">
           <p className="truncate">
             { mensaje }
           </p>
         </div>
+    </div>
     </div>
   );
 }
