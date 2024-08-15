@@ -16,7 +16,6 @@ export function Recursos(){
         > 
             <span className="flex items-center border rounded-full p-1 cursor-pointer"
               onClick={ ()=> {
-                console.log("hola");
                 navigate("/Configuracion");
               } }
             >

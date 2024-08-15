@@ -31,10 +31,10 @@ export function Modal({isOpen,cancelar,aceptar,disableAceptar,children}:Props){
 
         <div 
         
-        className="fixed w-screen h-screen bg-black bg-opacity-70 backdrop-blur-sm z-10 inset-0 transition-all duration-700 ease-in-out">
+        className="fixed w-screen h-screen bg-black bg-opacity-70 backdrop-blur-sm z-10 inset-0">
           <div 
           ref={referencia}
-          className="fixed bg-transparent z-10 inset-0 flex flex-col justify-center border-0 sm:border w-full h-full sm:w-5/6 sm:h-5/6 lg:w-1/2 lg:h-1/2 left-0 top-0 sm:left-[10%] sm:top-[10%] lg:top-1/4 lg:left-1/4 rounded-2xl transition-all duration-700 ease-in-out"
+          className="fixed bg-transparent z-10 inset-0 flex flex-col justify-center border-0 sm:border w-full h-full sm:w-5/6 sm:h-5/6 lg:w-1/2 lg:h-1/2 left-0 top-0 sm:left-[10%] sm:top-[10%] lg:top-1/4 lg:left-1/4 rounded-2xl"
           >
 
             <div 

@@ -16,7 +16,7 @@ import { Bebida } from "./Interfaces/Bebida";
 import { getPlatosCalientes, updatePlatoCaliente } from "./VistaPrincipal/PaginasVistaPrincipal/UI";
 import { getBebidas, getPlatosFrios, getPostres, updateBebida, updatePlatoFrio, updatePostre } from "./VistaPrincipal/PaginasVistaPrincipal";
 
-//TODO  la validacion del formulario del login y la validacion de los datos para register en el backend y el redirigir de la pagina
+//TODO  hacer en la  pagina de autentificacion que la contraseña se muestre o no a peticion del usuario
 //TODO: si es usuario o administrador se tiene que  mostrar la seccion editar o no
 // TODO: documentar la api del backend
 
@@ -76,6 +76,10 @@ interface ContextoProps {
   handleChangeSelecionBarraLateral: (e: string) => void;
   acceso: boolean;
   setAcceso: (e: boolean) => void;
+  redireccion: boolean;
+  setRedireccion: (e: boolean) => void;
+  redireccionAutentificacion: boolean;
+  setRedireccionAutentificacion: (e: boolean) => void;
   login: (e: Usuario) => void;
   logout: () => void;
   usuario: Usuario | null;
@@ -133,6 +137,10 @@ const defaultContext: ContextoProps = {
   handleChangeSelecionBarraLateral: () => {},
   acceso: false,
   setAcceso: ()=> {},
+  redireccion: false,
+  setRedireccion: ()=> {},
+  redireccionAutentificacion: false,
+  setRedireccionAutentificacion: ()=> {},
   login: () => {},
   logout: () => {},
   usuario: null,
@@ -178,6 +186,9 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     return exist ? true : false;
   });
 
+  const [redireccion, setRedireccion] = useState(false);
+  const [redireccionAutentificacion, setRedireccionAutentificacion] = useState(false);
+
   function login(usuario: Usuario | null) {
     if (usuario) {
       localStorage.setItem("usuario", JSON.stringify(usuario));
@@ -217,6 +228,8 @@ export function ContextoGlobal({ children }: ContextoGlobalProps) {
     localStorage.removeItem('paginaActual-bebidas');
     localStorage.removeItem('paginaActual-postres');
     localStorage.removeItem('seccionBarraLateralAVisualizar');
+    setSelectElementBarraLateral(seleccionSeccion);
+    setverOcultarRestoDeSeccion(false);
                   setAcceso(false);
                   setUsuario(null);
   }
@@ -718,6 +731,10 @@ useEffect(() => {
         handleChangeSelecionBarraLateral: handleChangeSelecionBarraLateral,
         acceso: acceso,
         setAcceso:setAcceso,
+        redireccion: redireccion,
+        setRedireccion:setRedireccion,
+        redireccionAutentificacion: redireccionAutentificacion,
+        setRedireccionAutentificacion:setRedireccionAutentificacion,
         login: login,
         logout:logout,
         usuario:usuario,

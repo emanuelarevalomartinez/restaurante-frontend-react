@@ -63,7 +63,7 @@ export function BarraLateral({ visivility }: Props) {
       </Modal>
 
       <div
-        className={`flex flex-col justify-between bg-[#1F1D2B] -left-full fixed top-0 w-28 h-full py-6 rounded-t-xl rounded-b-xl lg:left-0 ${
+        className={`flex flex-col justify-between bg-[#1F1D2B] -left-full fixed top-0 w-28 h-full py-6 rounded-t-xl rounded-b-xl lg:left-0 overflow-y-auto scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-100 ${
           visivility ? "left-0" : "-left-full"
         }`}
       >

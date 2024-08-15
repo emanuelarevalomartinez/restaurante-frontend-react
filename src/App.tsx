@@ -4,6 +4,8 @@ import { MenuVistaMovil } from "./BarraInferior";
 import { useContext } from "react";
 import { Secundaria, VistaPrincipal } from "./VistaPrincipal";
 import { Autentificacion } from "./Autentificacion/Autentificacion";
+import { Redireccion } from "./Autentificacion";
+import { RedireccionAutentificacion } from "./Configuracion";
 
 function App() {
   const {
@@ -13,15 +15,31 @@ function App() {
     HandleHacerVisibleSecundaria,
   } = useContext(Contexto);
 
-  const { acceso } = useContext(Contexto);
+  const { acceso, redireccion, redireccionAutentificacion } = useContext(Contexto);
 
-  if (!acceso) {
+  if (!acceso && redireccionAutentificacion) {
+    return (
+      <>
+        <RedireccionAutentificacion />
+      </>
+    );
+  }
+  if (!acceso && !redireccion) {
     return (
       <>
         <Autentificacion />
       </>
     );
   }
+
+  if(!acceso && redireccion){
+      return(
+        <>
+        <Redireccion/>
+        </>
+      )
+  }
+
 
   return (
     <>

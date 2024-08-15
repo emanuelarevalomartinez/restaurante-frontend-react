@@ -6,3 +6,11 @@ export interface Usuario{
     token:string;
     idUsuario:string;
 }
+
+export interface UsuarioUpdate{
+    idUsuario:string;
+    nombre?:string;
+    email?:string;
+    password?:string;
+    
+}

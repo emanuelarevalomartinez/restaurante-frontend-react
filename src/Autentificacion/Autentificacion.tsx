@@ -1,15 +1,18 @@
 import { FormEvent, useContext, useEffect, useState } from "react";
 import {  getUsuarioLogeado, SetUsuarioRegister } from ".";
-import { Usuario, UsuarioLogin, UsuarioRegisterExist, UsuarioRegistrar } from "../Interfaces";
+import {  UsuarioLogin, UsuarioRegisterExist, UsuarioRegistrar } from "../Interfaces";
 import { ImputGlobal } from "../common";
 import imagenShop from '../common/images/coffee-shop.jpg'
 import imagenDrinkWine from '../common/images/drinking-wine.jpg'
 import { Contexto } from "../Contexto";
+import { useNavigate } from "react-router-dom";
 
 export function Autentificacion() {
 
 
- const { login } = useContext(Contexto);
+ const { login, setRedireccion } = useContext(Contexto);
+
+ const navigate = useNavigate();
 
 
   const [nombre, setNombre] = useState("");
@@ -61,6 +64,7 @@ export function Autentificacion() {
              if (respuesta) {
               setUsuarioNoExistente(false);
               login(respuesta);
+              navigate("/");
              } else {
               setCamposIncorrectos(false);
               setCamposVacios(false);
@@ -143,6 +147,7 @@ export function Autentificacion() {
           console.log("Usuario registrado con éxito:", nuevoUsuario);
           setUsuarioYaExistenteRegistro(false);
           setEmaiYaExistenteRegistro(false);
+          setRedireccion(true);
       }
                   
         }

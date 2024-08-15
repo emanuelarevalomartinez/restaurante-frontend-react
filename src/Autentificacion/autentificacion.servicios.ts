@@ -48,3 +48,24 @@ export async function getUsuarioLogeado(datos: UsuarioLogin): Promise<Usuario | 
       return null;
     }
   }
+
+  export async function deleteUsuario(idUsuario: string){
+    try {
+      const response = await fetch(`http://localhost:3000/api/usuario/${idUsuario}`, {
+        method: "DELETE",
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error en la respuesta del servidor:', errorData); 
+        throw new Error(`HTTP error! status: ${response.status}, message: ${JSON.stringify(errorData)}`);
+      }
+  
+    } catch (error) {
+      console.error('Error al eliminar el usuario mediante id:', error);
+      return null;
+    }
+  }
