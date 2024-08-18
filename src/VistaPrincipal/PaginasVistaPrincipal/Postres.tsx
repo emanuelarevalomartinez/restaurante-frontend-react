@@ -13,6 +13,7 @@ export function Postres() {
     setLosPostres,
     escuchaPostres,
     setEscuchaPostres,
+    lenguajeEs,
   } = useContext(Contexto);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -72,7 +73,7 @@ export function Postres() {
   return (
     <div className={`${verOcultarRestoDeSeccion ? "hidden" : "px-4"}`}>
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl text-gray-300">Postres</h2>
+        <h2 className="text-xl text-gray-300"> { lenguajeEs? "Desserts" :"Postres" } </h2>
 
         <Seleccionar
           listaElementos={elementos}

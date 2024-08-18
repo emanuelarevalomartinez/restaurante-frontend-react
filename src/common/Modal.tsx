@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
+import { Contexto } from "../Contexto";
 
 interface Props{
      children: React.ReactNode;
@@ -9,6 +10,8 @@ interface Props{
   }
 
 export function Modal({isOpen,cancelar,aceptar,disableAceptar,children}:Props){
+
+  const { lenguajeEs } = useContext(Contexto);
 
     const referencia = useRef<HTMLDivElement>(null);
 
@@ -31,7 +34,7 @@ export function Modal({isOpen,cancelar,aceptar,disableAceptar,children}:Props){
 
         <div 
         
-        className="fixed w-screen h-screen bg-black bg-opacity-70 backdrop-blur-sm z-10 inset-0">
+        className="fixed w-screen h-screen bg-black bg-opacity-70 backdrop-blur-sm z-50 inset-0">
           <div 
           ref={referencia}
           className="fixed bg-transparent z-10 inset-0 flex flex-col justify-center border-0 sm:border w-full h-full sm:w-5/6 sm:h-5/6 lg:w-1/2 lg:h-1/2 left-0 top-0 sm:left-[10%] sm:top-[10%] lg:top-1/4 lg:left-1/4 rounded-2xl"
@@ -49,14 +52,14 @@ export function Modal({isOpen,cancelar,aceptar,disableAceptar,children}:Props){
             <button 
             className="sm:bg-transparent bg-[#ec7c6a] hover:bg-[#e02a0e] border-0 sm:border text-black sm:text-red-500 py-0 px-4 sm:py-2 m-auto rounded-2xl hover:text-white hover:border-transparent"
             onClick={ ()=> { cancelar() } }
-            >Cancelar</button>
+            > { lenguajeEs? "Cancel" : "Cancelar" } </button>
             <button 
             className={`${disableAceptar? "bg-gray-500" : "sm:bg-transparent bg-[#6a97ec] hover:bg-[#0e2de0] border-0 sm:border text-black sm:text-blue-500 hover:text-white hover:border-transparent"} py-0 px-4 sm:py-2 m-auto rounded-2xl`}
             disabled={disableAceptar}
             onClick={ ()=> {
                 aceptar();
             } }
-            >Aceptar</button>
+            > { lenguajeEs? "Accept" : "Aceptar" } </button>
             </div>
           </div>
         </div>

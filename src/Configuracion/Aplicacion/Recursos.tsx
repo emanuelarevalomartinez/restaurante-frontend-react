@@ -1,10 +1,14 @@
 import { RiArrowLeftLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import { Contexto } from "../../Contexto";
+import { useContext } from "react";
 
 
 export function Recursos(){
 
     const navigate = useNavigate();
+
+    const { lenguajeEs } = useContext(Contexto);
 
     // TODO: Hay que colocar todos los datos pertinentes aqui y ajustar el texto
 
@@ -21,12 +25,12 @@ export function Recursos(){
             >
                 <RiArrowLeftLine/>
                  </span> 
-            Configuración/Recursos
+           { lenguajeEs? "Configuration/Resources" : " Configuración/Recursos" }
             </h2>
       </div>
 
 <div  className="text-white text-wrap">
-    <p>  Recursos externos empleados en el proyecto los cuales fueron empleados con una  licencia gratuita</p>
+    <p> { lenguajeEs? "External resources used in the project which were used with a free license" : "Recursos externos empleados en el proyecto los cuales fueron empleados con una  licencia gratuita" }   </p>
 </div>
 
         </div>

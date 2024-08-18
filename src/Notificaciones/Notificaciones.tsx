@@ -9,13 +9,26 @@ import { Auth } from "../Autentificacion/Auth";
 
 export function Notificaciones(){
 
+  const { lasNotificaciones, setLasNotificaciones, escuchaNotificaciones, setEscuchaNotificaciones, lenguajeEs } = useContext(Contexto);
+  
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [seleccion, setSeleccion] = useState("Ultimas");
-    const [elementos] = useState(["Ultimas", "Primeras"]);
+    const [seleccion, setSeleccion] = useState( ()=> {
+      if(lenguajeEs){
+      return "Latest"
+      } else {
+        return "Ultimas"
+      }
+    } );
+    const [elementos] = useState(()=> {
+      if(lenguajeEs){
+      return ["Latest", "First"]
+       } else {
+        return ["Ultimas", "Primeras"];
+       }
+    });
     const referencia = useRef<HTMLDivElement>(null);
 
-    const { lasNotificaciones, setLasNotificaciones, escuchaNotificaciones, setEscuchaNotificaciones } = useContext(Contexto);
   
     const hacerClick = () => setIsOpen(!isOpen);
   
@@ -41,10 +54,9 @@ export function Notificaciones(){
       setIsLoading(true);
      const auth = Auth();
      if(auth){
-       const notificaciones = await getLasNotificaciones(auth.idUsuario, seleccion === "Ultimas");
+       const notificaciones = await getLasNotificaciones(auth.idUsuario, seleccion === "Ultimas" || seleccion === "Latest");
        setLasNotificaciones(notificaciones);
        setEscuchaNotificaciones(false);
-       // calcularTotalPaginas(totalDeProductos);
        setIsLoading(false);
      }
     };
@@ -78,7 +90,7 @@ export function Notificaciones(){
     return(
         <div className="mt-48 sm:mt-44 md:mt-40 lg:mt-40 mx-2">
              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-xl text-gray-300">Notificaciones</h2>
+                <h2 className="text-xl text-gray-300"> { lenguajeEs? "Notifications" : "Notificaciones"} </h2>
                    <Seleccionar
           listaElementos={elementos}
           seleccion={seleccion}

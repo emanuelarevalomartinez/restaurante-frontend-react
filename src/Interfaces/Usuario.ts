@@ -8,9 +8,22 @@ export interface Usuario{
 }
 
 export interface UsuarioUpdate{
-    idUsuario:string;
     nombre?:string;
     email?:string;
     password?:string;
+    newPassword?:string;
     
+}
+export interface UsuarioUpdateReturnCorrect{
+    token:string;
+    nombre?:string;
+    email?:string;
+    password?:string;
+    newPassword?:string;
+}
+
+export interface UsuarioUpdateReturnError{
+    nombreExiste:boolean;
+  emailExiste: boolean;
+  passwordIncorrecta: boolean;
 }

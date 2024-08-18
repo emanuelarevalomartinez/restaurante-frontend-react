@@ -18,7 +18,7 @@ const { verOcultarRestoDeSeccion } = useContext(Contexto);
 
     return (
         <main className={`${verOcultarRestoDeSeccion? "col-span-8" : "col-span-6"}`}>
-            <div className={`${verOcultarRestoDeSeccion? "lg:w-full" : "lg:w-2/3"} fixed bg-[#1F1D3B] w-full left-auto lg:left-28 xl:w-[70vw]`}>
+            <div className={`${verOcultarRestoDeSeccion? "lg:w-full" : "lg:w-2/3 xl:w-[68%]"} fixed bg-[#1F1D3B] w-full left-auto lg:left-28`}>
                 <div>
                     <Cabecera/>
                 </div>

@@ -28,6 +28,7 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
     setEscuchaPlatosFrios,
     setEscuchaPostres,
     setEscuchaNotificaciones,
+    lenguajeEs,
   } = useContext(Contexto);
 
   useEffect(() => {
@@ -116,13 +117,13 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
       {losPedidos.length == 0 ? (
             <div>
                 <p className="text-center text-3xl">
-                  Aún no tiene ningún producto en el carrito.
+                  { lenguajeEs? "You don't have any products in your cart yet." : "Aún no tiene ningún producto en el carrito." }
                 </p>
             </div>
           ) : (
             <div>
               <p className="text-center text-3xl">
-              ¿Estas seguro de que quieres eliminar todos tus pedidos del carrito?
+             { lenguajeEs? "Are you sure you want to remove all your orders from the cart ?" : " ¿Estas seguro de que quieres eliminar todos tus pedidos del carrito?" }
               </p>
             </div>
           )}
@@ -150,7 +151,7 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
           </div>
 
           <div className="text-gray-300 px-4 lg:mt-5">
-            <h1 className="text-2xl">Pedidos</h1>
+            <h1 className="text-2xl"> { lenguajeEs?  "Orders" : "Pedidos" } </h1>
           </div>
 
           <div
@@ -159,19 +160,19 @@ export function Secundaria({ visivility, changeVisilitySecundaria }: Props) {
               setOpen(true);
             }}
           >
-            <AccionEnCarrito nombre={"Eliminar todos los pedidos"} />
+            <AccionEnCarrito nombre={ `${lenguajeEs? "Delete all orders" : "Eliminar todos los pedidos" }` } />
           </div>
 
           <div className="text-gray-300 mx-4">
             <div className="grid grid-cols-6">
-              <h5 className="col-span-4">Artículo</h5>
+              <h5 className="col-span-4">{ lenguajeEs? "Article" : "Artículo" }</h5>
               <h5 className="col-span-2 flex justify-center">Cant.</h5>
             </div>
 
             <div className="h-[50vh] lg:h-[60vh] overflow-y-scroll scrollbar-thin scrollbar-thumb-red-500 scrollbar-track-gray-100">
               {losPedidos.length === 0 ? (
                 <div className="rounded-sm text-center py-10 sm:py-40 lg:py-52 text-red-500 border-t-2 mt-1 border-b-2 border-red-500 m-auto">
-                  <span>Aún no tiene pedidos</span>
+                  <span> { lenguajeEs? "You do not have any orders yet" : "Aún no tiene pedidos" } </span>
                 </div>
               ) : (
                 losPedidos.map((pedido, index) => (

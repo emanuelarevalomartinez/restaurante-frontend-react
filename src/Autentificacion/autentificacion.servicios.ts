@@ -1,5 +1,5 @@
 
-import { Usuario, UsuarioLogin, UsuarioRegisterExist, UsuarioRegistrar } from "../Interfaces";
+import { Usuario, UsuarioLogin, UsuarioRegisterExist, UsuarioRegistrar, UsuarioUpdate, UsuarioUpdateReturnCorrect, UsuarioUpdateReturnError } from "../Interfaces";
 
 
 export async function SetUsuarioRegister(datos: UsuarioRegistrar): Promise<UsuarioRegistrar | UsuarioRegisterExist | null>{
@@ -45,6 +45,30 @@ export async function getUsuarioLogeado(datos: UsuarioLogin): Promise<Usuario | 
       return data;
     } catch (error) {
       console.error(error);
+      return null;
+    }
+  }
+
+  export async function updateUsuario(idUsuario:string, actualizarUsuario: UsuarioUpdate){
+    try {
+      const response = await fetch(`http://localhost:3000/api/usuario/${idUsuario}`, {
+        method: "PATCH",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(actualizarUsuario),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error en la respuesta del servidor:', errorData);
+        throw new Error(`HTTP error! status: ${response.status}, message: ${JSON.stringify(errorData)}`);
+      }
+  
+      const data: UsuarioUpdateReturnCorrect | UsuarioUpdateReturnError = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error de actualización:', error);
       return null;
     }
   }

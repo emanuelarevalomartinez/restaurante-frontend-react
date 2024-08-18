@@ -13,6 +13,7 @@ export function Bebidas() {
     setLasBebidas,
     escuchaBebidas,
     setEscuchaBebidas,
+    lenguajeEs,
   } = useContext(Contexto);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -72,7 +73,7 @@ export function Bebidas() {
   return (
     <div className={`${verOcultarRestoDeSeccion ? "hidden" : "px-4"}`}>
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl text-gray-300">Bebidas</h2>
+        <h2 className="text-xl text-gray-300">{ lenguajeEs? "Drinks" : "Bebidas" }</h2>
 
         <Seleccionar
           listaElementos={elementos}

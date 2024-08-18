@@ -1,20 +1,23 @@
 
+import { useContext } from "react";
 import { FacebookIcon, InstagramIcon, TelegramIcon, TwitterIcon } from ".";
 import { ImputGlobal, LabelGlobal } from "../common";
+import { Contexto } from "../Contexto";
 
 
 export function AcercaDe() {
+
+  const { lenguajeEs } = useContext(Contexto);
 
   return (
     <section className="bg-[#262837] text-gray-400">
       <div className="mx-auto px-5 py-24">
         <div className="mb-12 flex w-full flex-col text-center">
           <h1 className="title-font mb-4 text-2xl font-medium text-white sm:text-3xl">
-            Contactame
+            { lenguajeEs? "Contact me" : "Contactame" }
           </h1>
           <p className="mx-auto text-base leading-relaxed lg:w-2/3">
-            Hola soy un desarrollador en crecimiento por lo que cualquier
-            comentario que quieras dejarme sobre esta página sera bien recibido.
+            { lenguajeEs? "Hi, I'm a growing developer so any comments you want to leave me about this page will be welcome." : "Hola soy un desarrollador en crecimiento por lo que cualquier comentario que quieras dejarme sobre esta página sera bien recibido." }
           </p>
         </div>
 
@@ -24,7 +27,7 @@ export function AcercaDe() {
             <div className="inline-block w-full sm:w-1/2 sm:pr-2">
               <div>
                 <LabelGlobal color="asercaDe">
-                  Nombre
+                  { lenguajeEs? "Name" :"Nombre" }
                 </LabelGlobal>
                 <ImputGlobal type="text" id="name" name="name"/>
               </div>
@@ -32,7 +35,7 @@ export function AcercaDe() {
             <div className="inline-block w-full sm:w-1/2 sm:pl-2">
               <div>
                 <LabelGlobal color="asercaDe">
-                  Correo
+                { lenguajeEs? "Email" : "Correo" }
                 </LabelGlobal>
                 <ImputGlobal type="text" id="email" name="email"/>
               </div>
@@ -40,7 +43,7 @@ export function AcercaDe() {
             <div>
               <div>
                 <LabelGlobal color="asercaDe">
-                  Mensaje
+                  { lenguajeEs? "Message" : "Mensaje" }
                 </LabelGlobal>
                 <textarea
                   id="message"
@@ -56,10 +59,10 @@ export function AcercaDe() {
             <div className="w-full p-2">
               <button className="mx-auto flex rounded border-0 bg-indigo-500 py-2 px-8 text-lg text-white hover:bg-indigo-600 focus:outline-none"
               onClick={()=> {
-                alert("Esta funcionalidad aún no esta disponible entendemos su intención y lo agradecemos");
+                alert(`${lenguajeEs? "This functionality is not yet available. We understand your intention and we appreciate it." : "Esta funcionalidad aún no esta disponible entendemos su intención y lo agradecemos"} `);
               }}
               >
-                Enviar
+                { lenguajeEs? "Send" :"Enviar" }
               </button>
             </div>
 

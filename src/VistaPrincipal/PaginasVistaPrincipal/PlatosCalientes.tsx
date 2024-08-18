@@ -7,7 +7,7 @@ import { Contexto } from "../../Contexto";
 import usePaginacion from "../../common/usePaginacion";
 
 export function PlatosCalientes() {
-  const { verOcultarRestoDeSeccion, setPlatosCalientes, platosCalientes, escuchaPlatosCalientes,setEscuchaPlatosCalientes } = useContext(Contexto);
+  const { verOcultarRestoDeSeccion, setPlatosCalientes, platosCalientes, escuchaPlatosCalientes,setEscuchaPlatosCalientes, lenguajeEs } = useContext(Contexto);
 
   const [isOpen, setIsOpen] = useState(false);
   const [seleccion, setSeleccion] = useState("A-Z");
@@ -64,7 +64,7 @@ export function PlatosCalientes() {
   return (
     <div className={`${verOcultarRestoDeSeccion ? "hidden" : "px-4"}`}>
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-xl text-gray-300">Platos Calientes</h2>
+        <h2 className="text-xl text-gray-300"> { lenguajeEs? "Hot Dishes" : "Platos Calientes" } </h2>
 
         <Seleccionar
           listaElementos={elementos}

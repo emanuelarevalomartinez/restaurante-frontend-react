@@ -8,7 +8,7 @@ export function Enviar() {
   const [open, setOpen] = useState(false);
   const [totalAPagar, settotalAPagar] = useState(0);
 
-  const { escuchaPedidos } = useContext(Contexto);
+  const { escuchaPedidos, lenguajeEs } = useContext(Contexto);
 
   function cancelar() {
     setOpen(false);
@@ -42,13 +42,13 @@ export function Enviar() {
           {totalAPagar == 0 ? (
             <div>
                 <p className="text-center text-3xl">
-                  Aún no tiene productos en el carrito para ejecutar esta acción.
+                   { lenguajeEs? "You do not have any products in your cart yet to perform this action." : "Aún no tiene productos en el carrito para ejecutar esta acción." } 
                 </p>
             </div>
           ) : (
             <div>
               <p className="text-center text-3xl">
-                ¿Desea comprar los productos que añadio al carrito?
+                { lenguajeEs? "Do you want to purchase the products you added to your cart ?" : "¿Desea comprar los productos que añadio al carrito?" }
               </p>
             </div>
           )}
@@ -59,7 +59,7 @@ export function Enviar() {
         className={`bg-[#262837] w-full fixed bottom-0 left-auto text-center lg:bottom-0 lg:right-0 lg:left-auto lg:w-1/4 p-4 mx-auto`}
       >
         <div className="flex items-center justify-between mb-1 sm:mb-6">
-          <span className="text-gray-400">Total a pagar</span>
+          <span className="text-gray-400"> { lenguajeEs? "Total to pay" : "Total a pagar" } </span>
           <span className="text-gray-400">
             $ {formatearNumero(totalAPagar)}
           </span>
@@ -70,7 +70,7 @@ export function Enviar() {
             setOpen(true);
           }}
         >
-          <button>Pagar</button>
+          <button> { lenguajeEs?  "Pay" : "Pagar" } </button>
         </div>
       </div>
     </>

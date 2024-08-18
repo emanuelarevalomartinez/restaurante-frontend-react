@@ -21,6 +21,8 @@ import { getBebidas, getPlatosFrios, getPostres, updateBebida, updatePlatoFrio, 
 // TODO: documentar la api del backend
 
 interface ContextoProps {
+  lenguajeEs:boolean;
+  setLenguajeEs: (e: boolean)=> void;
   barraVistaMovil: boolean;
   barraLateralVisivilidad: boolean;
   mostrarVistaSecundaria: boolean;
@@ -91,6 +93,8 @@ interface ContextoGlobalProps {
 }
 
 const defaultContext: ContextoProps = {
+  lenguajeEs:true,
+  setLenguajeEs: ()=> {},
   barraVistaMovil: false,
   barraLateralVisivilidad: false,
   mostrarVistaSecundaria: false,
@@ -150,6 +154,15 @@ const defaultContext: ContextoProps = {
 export const Contexto = createContext<ContextoProps>(defaultContext);
 
 export function ContextoGlobal({ children }: ContextoGlobalProps) {
+  const [lenguajeEs, setLenguajeEs] = useState( ()=> {
+    const es = localStorage.getItem('es');
+    if(es){
+      return JSON.parse(es);
+    } else {
+      return true;
+    }
+  } );
+  
   const [barraVistaMovil] = useState<boolean>(true);
   const [barraLateralVisivilidad, setbarraLateralVisivilidad] =
     useState<boolean>(false);
@@ -690,6 +703,8 @@ useEffect(() => {
   return (
     <Contexto.Provider
       value={{
+        lenguajeEs:lenguajeEs,
+        setLenguajeEs: setLenguajeEs,
         barraVistaMovil: barraVistaMovil,
         barraLateralVisivilidad: barraLateralVisivilidad,
         mostrarVistaSecundaria: mostrarVistaSecundaria,

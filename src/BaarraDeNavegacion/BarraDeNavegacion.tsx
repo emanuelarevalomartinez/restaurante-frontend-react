@@ -15,7 +15,7 @@ export function BarraDeNavegacion() {
 
     const auth = Auth();
 
-    const { verOcultarRestoDeSeccion } = useContext(Contexto);
+    const { verOcultarRestoDeSeccion, lenguajeEs } = useContext(Contexto);
 
 useEffect(() => {
 
@@ -55,22 +55,22 @@ useEffect(() => {
             <Link 
                 to="/"
                 onClick={() => { HandleCambiarEstado(0) }}
-                className={estadoSeleccion == 0 ? platosCalientes : estiloNormal}> <span className="mr-2">Platos</span> <span>Calientes</span>
+                className={estadoSeleccion == 0 ? platosCalientes : estiloNormal}> <span className="mr-2">{ lenguajeEs? "Hot" : "Platos" }</span> <span> { lenguajeEs? "Dishes" : "Calientes" }</span>
             </Link>
             <Link 
                 to="/PlatosFrios"
                 onClick={() => { HandleCambiarEstado(1) }}
-                className={estadoSeleccion == 1 ? platosFrios : estiloNormal}> <span className="mr-2">Platos</span> <span>Fríos</span>
+                className={estadoSeleccion == 1 ? platosFrios : estiloNormal}> <span className="mr-2">{ lenguajeEs? "Cold" : "Platos" }</span> <span> { lenguajeEs? "Dishes" : "Fríos" } </span>
             </Link>
             <Link 
                 to="/Bebidas"
                 onClick={() => { HandleCambiarEstado(2) }}
-                className={estadoSeleccion == 2 ? bebidas : estiloNormal}> Bebidas
+                className={estadoSeleccion == 2 ? bebidas : estiloNormal}> { lenguajeEs? "Drinks" : "Bebidas" }
             </Link>
             <Link 
                 to="/Postres"
                 onClick={() => { HandleCambiarEstado(3) }}
-                className={estadoSeleccion == 3 ? postres : estiloNormal}> Postres
+                className={estadoSeleccion == 3 ? postres : estiloNormal}> { lenguajeEs? "Desserts" : "Postres" }
             </Link>
         </nav>
     )
